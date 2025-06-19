@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LINE LIFF情報 (GitHub Pages)</title>
+<style>
+body {
+font-family: sans-serif;
+text-align: center;
+      margin-top: 50px;
+background-color: #f0f2f5;
+}
+.container {
+background-color: white;
+padding: 20px;
+border-radius: 8px;
+ box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+max-width: 400px;
+margin: 0 auto;
+}
+h1 {
+color: #333;
+}
+p {
+font-size: 1.1em;
+color: #555;
+margin-bottom: 10px;
+}
+#userName, #chatRoomId {
+font-weight: bold;
+color: #007bff;
+}
+.loading {
+color: #888;
+}
+</style>
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+</head>
+<body>
+<div class="container">
+<h1>LINE LIFF情報</h1>
+<p>ユーザー名: <span id="userName" class="loading">読み込み中...</span></p>
+<p>トークルームID: <span id="chatRoomId" class="loading">読み込み中...</span></p>
+</div>
+
+    <script>
+        // ★重要: ここにLINE Developersで取得したあなたのLIFF IDを設定してください★
+        // 例: const liffId = '2000000000-XXXXXXXX';
+        const liffId = 'YOUR_LIFF_ID'; // <-- ★ここを必ず自分のLIFF IDに置き換える！
+
+        // LIFF SDKが読み込まれているかを確認するための簡易チェック
+        if (typeof liff === 'undefined') {
+            console.error("エラー: LIFF SDKが読み込まれていません。スクリプトタグを確認してください。");
+            document.getElementById('userName').innerText = 'エラー: LIFF SDKが読み込めません。';
+            document.getElementById('chatRoomId').innerText = 'コンソールを確認してください。';
+            // ここで処理を中断
+        } else {
+            console.log("LIFF SDKは正常に読み込まれています。");
+            console.log('設定されたLIFF ID:', liffId);
+
+            // LIFFアプリの初期化
+            liff.init({
+                liffId: liffId 
+            })
+            .then(() => {
+                console.log("LIFF initialization successful!");
+                document.getElementById('userName').classList.remove('loading');
+                document.getElementById('chatRoomId').classList.remove('loading');
+
+                if (liff.isLoggedIn()) {
+                    console.log("LIFF is logged in.");
+
+                    // ユーザー情報を取得
+                    liff.getProfile().then(profile => {
+                        document.getElementById('userName').innerText = profile.displayName;
+                        console.log('User Profile:', profile);
+                    }).catch(err => {
+                        console.error("Error getting profile: ", err);
+                        document.getElementById('userName').innerText = 'ユーザー名取得エラー';
+                    });
+
+                    // トークルームIDを取得（チャットまたはグループから開かれた場合のみ）
+                    const context = liff.getContext();
+                    if (context) {
+                        console.log('LIFF Context:', context);
+                        if (context.type === 'chat' || context.type === 'room') {
+                            document.getElementById('chatRoomId').innerText = context.chatId;
+                        } else {
+                            document.getElementById('chatRoomId').innerText = `（チャット/グループ以外から開かれました: ${context.type}）`;
+                        }
+                    } else {
+                        document.getElementById('chatRoomId').innerText = '（LIFFコンテキストが取得できません）';
+                        console.warn('LIFF context is null.');
+                    }
+
+                } else {
+                    console.warn("LIFFはログインしていません。自動ログインを試みます...");
+                    document.getElementById('userName').innerText = 'LIFFにログインしていません。';
+                    document.getElementById('chatRoomId').innerText = '（自動ログインを試みます）';
+                    liff.login(); // ここでliff.login()を呼び出す
+                    // ログインが成功すると、ページがリロードされ、再度initから処理が開始されます
+                }
+            })
+            .catch((err) => {
+                console.error("LIFF初期化に失敗しました: ", err);
+                document.getElementById('userName').innerText = 'LIFF初期化エラー';
+                document.getElementById('chatRoomId').innerText = '（詳細はコンソールを確認）';
+            });
+        }
+    </script>
+</body>
+</html>
+```
