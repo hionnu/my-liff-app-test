@@ -120,6 +120,7 @@
             font-weight: bold;
             text-align: center;
             color: green;
+            white-space: pre-wrap; /* 改行を有効にする */
         }
         .error {
             color: red;
@@ -370,10 +371,16 @@
                 
                 // レスポンスのHTTPステータスコードをチェック
                 if (!response.ok) {
-                    const errorText = await response.text(); // テキストとしてエラー内容を取得
-                    console.error('HTTP Error Status:', response.status);
-                    console.error('HTTP Error Text:', errorText);
-                    throw new Error(`GASからのHTTPエラー: ${response.status} - ${errorText}`);
+                    let errorDetails = `HTTPステータス: ${response.status}`;
+                    try {
+                        const errorJson = await response.json();
+                        errorDetails += `\nGASからのメッセージ: ${errorJson.message || JSON.stringify(errorJson)}`;
+                    } catch {
+                        const errorText = await response.text();
+                        errorDetails += `\nGASからの応答: ${errorText.substring(0, 100)}...`; // 長すぎる場合は切り詰める
+                    }
+                    console.error('HTTP Error Details:', errorDetails);
+                    throw new Error(`GASからのエラー: ${errorDetails}`);
                 }
 
                 const result = await response.json(); // JSONとして解析
@@ -395,9 +402,14 @@
                 statusMessage.innerText = `注文送信中にエラーが発生しました: ${error.message}`;
                 statusMessage.classList.add('error');
                 console.error('Error submitting order:', error);
+                
                 // ネットワークエラーの場合、URLが間違っていないか、CORS設定は正しいか確認を促す
                 if (error.message.includes('Failed to fetch')) {
-                    statusMessage.innerText += '\n(ヒント: GASのURLが正しいか、GASのデプロイとCORS設定を確認してください)';
+                    statusMessage.innerText += '\n\n【重要な確認事項】\n' +
+                                             '1. index.htmlのGASのURLが最新かつ正しいか？\n' +
+                                             '2. GASのデプロイが最新で「アクセスできるユーザー：全員」か？\n' +
+                                             '3. GASのCORSヘッダー（Access-Control-Allow-Origin: *）が正しく設定されているか？\n' +
+                                             '4. PC版LINEのF12開発者ツールの「Network」タブを確認し、\n   GASへのリクエストのStatusとResponseを確認してください。';
                 }
             } finally {
                 document.getElementById('submitOrder').disabled = false; // 送信ボタンを再度有効化
