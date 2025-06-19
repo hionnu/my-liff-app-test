@@ -189,9 +189,12 @@
 
     <script>
         // ★重要: ここにLINE Developersで取得したあなたのLIFF IDを設定してください★
+        // 例: const liffId = '2000000000-XXXXXXXX';
         const liffId = '2007576580-4q0azmME'; 
+
         // ★重要: ここにGASでデプロイしたウェブアプリのURLを設定してください★
-        const gasWebhookUrl = 'https://script.google.com/macros/s/AKfycbxofTZlUunt9Ff65AOCiUAqM9Vj63zOKXcWk4v7RAttvWVZKKHHK2TKRk-2DHE97DjD/exec'; 
+        // 例: const gasWebhookUrl = 'https://script.google.com/macros/s/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/exec';
+        const gasWebhookUrl = 'https://script.google.com/macros/s/AKfycbwtExg4OHPtdrkr5hab8XaAP4vTnMTed5PeSusnw8PSJvXPWoiOYkzlR9Xbe30SiJoa/exec'; 
 
         const statusMessage = document.getElementById('statusMessage');
         const fileInput = document.getElementById('fileInput');
@@ -346,13 +349,16 @@
                     document.getElementById('submitOrder').disabled = false;
                     return;
                 }
-
+                
+                // GASへの送信データ
                 const postData = {
                     userId: userId,
                     idToken: idToken,
                     formData: formData,
-                    files: uploadedFiles // 添付ファイルデータ
+                    files: uploadedFiles 
                 };
+
+                console.log("Sending data to GAS:", postData); // 送信データをコンソールにログ出力
 
                 const response = await fetch(gasWebhookUrl, {
                     method: 'POST',
@@ -361,8 +367,16 @@
                     },
                     body: JSON.stringify(postData)
                 });
+                
+                // レスポンスのHTTPステータスコードをチェック
+                if (!response.ok) {
+                    const errorText = await response.text(); // テキストとしてエラー内容を取得
+                    console.error('HTTP Error Status:', response.status);
+                    console.error('HTTP Error Text:', errorText);
+                    throw new Error(`GASからのHTTPエラー: ${response.status} - ${errorText}`);
+                }
 
-                const result = await response.json();
+                const result = await response.json(); // JSONとして解析
 
                 if (result.success) {
                     statusMessage.innerText = 'ご注文が送信されました！LINEに確認メッセージが送られました。';
@@ -371,14 +385,20 @@
                         liff.closeWindow(); // 成功後、LIFFアプリを閉じる
                     }, 2000); // 2秒後に閉じる
                 } else {
-                    statusMessage.innerText = `ご注文送信に失敗しました: ${result.message}`;
+                    // GASから返されたエラーメッセージを表示
+                    statusMessage.innerText = `ご注文送信に失敗しました: ${result.message || '不明なエラー'}`;
                     statusMessage.classList.add('error');
-                    console.error('Failed to submit order:', result.error);
+                    console.error('Failed to submit order (GAS response):', result.error);
                 }
             } catch (error) {
+                // 'Failed to fetch' やその他のネットワークエラーをここで捕捉
                 statusMessage.innerText = `注文送信中にエラーが発生しました: ${error.message}`;
                 statusMessage.classList.add('error');
                 console.error('Error submitting order:', error);
+                // ネットワークエラーの場合、URLが間違っていないか、CORS設定は正しいか確認を促す
+                if (error.message.includes('Failed to fetch')) {
+                    statusMessage.innerText += '\n(ヒント: GASのURLが正しいか、GASのデプロイとCORS設定を確認してください)';
+                }
             } finally {
                 document.getElementById('submitOrder').disabled = false; // 送信ボタンを再度有効化
             }
