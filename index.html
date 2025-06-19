@@ -2,88 +2,271 @@
 <html>
 <head>
     <meta charset="utf-8">
-     <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>LINE LIFF情報 (GitHub Pages)</title>
-<style>
-body {
-font-family: sans-serif;
-text-align: center;
-      margin-top: 50px;
-background-color: #f0f2f5;
-}
-.container {
-background-color: white;
-padding: 20px;
-border-radius: 8px;
- box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-max-width: 400px;
-margin: 0 auto;
-}
-h1 {
-color: #333;
-}
-p {
-font-size: 1.1em;
-color: #555;
-margin-bottom: 10px;
-}
-#userName, #chatRoomId {
-font-weight: bold;
-color: #007bff;
-}
-.loading {
-color: #888;
-}
-</style>
-<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>注文フォーム</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+        .container {
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 600px;
+            margin: 20px auto;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+        .info-section {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            text-align: center;
+        }
+        .info-section p {
+            margin: 5px 0;
+            font-size: 0.95em;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="tel"],
+        .form-group input[type="number"],
+        .form-group input[type="date"],
+        .form-group textarea,
+        .form-group select {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1em;
+            box-sizing: border-box; /* パディングを含めて幅を計算 */
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .form-group .required::after {
+            content: " *";
+            color: red;
+        }
+        .file-upload-group {
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+        .file-upload-group input[type="file"] {
+            display: block;
+            margin-top: 10px;
+        }
+        .file-list {
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #666;
+        }
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+            background-color: #f9f9f9;
+            padding: 5px;
+            border-radius: 3px;
+        }
+        .file-item button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 3px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.8em;
+        }
+        .file-item button:hover {
+            background-color: #c82333;
+        }
+
+        button#submitOrder {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            margin-top: 30px;
+            width: 100%;
+        }
+        button#submitOrder:hover {
+            background-color: #0056b3;
+        }
+        #statusMessage {
+            margin-top: 20px;
+            font-weight: bold;
+            text-align: center;
+            color: green;
+        }
+        .error {
+            color: red;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 </head>
 <body>
-<div class="container">
-<h1>LINE LIFF情報</h1>
-<p>ユーザー名: <span id="userName" class="loading">読み込み中...</span></p>
-<p>トークルームID: <span id="chatRoomId" class="loading">読み込み中...</span></p>
-</div>
+    <div class="container">
+        <h1>注文受付フォーム</h1>
+        <div class="info-section">
+            <p>ユーザー名: <span id="userName" class="loading">読み込み中...</span></p>
+            <p>トークルームID: <span id="chatRoomId" class="loading">読み込み中...</span></p>
+        </div>
+
+        <form id="orderForm">
+            <div class="form-group">
+                <label for="companyName" class="required">会社名</label>
+                <input type="text" id="companyName" required>
+            </div>
+            <div class="form-group">
+                <label for="fullName" class="required">氏名</label>
+                <input type="text" id="fullName" required>
+            </div>
+            <div class="form-group">
+                <label for="email" class="required">メールアドレス</label>
+                <input type="email" id="email" required>
+            </div>
+            <div class="form-group">
+                <label for="phoneNumber" class="required">電話番号</label>
+                <input type="tel" id="phoneNumber" pattern="[0-9\-]+" title="半角数字とハイフンのみ" required>
+            </div>
+            <div class="form-group">
+                <label for="orderContent" class="required">注文内容</label>
+                <textarea id="orderContent" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="notes">特記事項 (任意)</label>
+                <textarea id="notes"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="deliveryDate" class="required">配送日</label>
+                <input type="date" id="deliveryDate" required>
+            </div>
+            <div class="form-group">
+                <label for="scaffoldDate">足場組立日 (任意)</label>
+                <input type="date" id="scaffoldDate">
+            </div>
+            <div class="form-group">
+                <label for="jotoDate" class="required">上棟日</label>
+                <input type="date" id="jotoDate" required>
+            </div>
+
+            <div class="form-group file-upload-group">
+                <label>添付ファイル (任意, 最大3つまで)</label>
+                <input type="file" id="fileInput" accept="image/*, .pdf" multiple>
+                <div id="fileList" class="file-list"></div>
+            </div>
+            
+            <button type="submit" id="submitOrder">注文する</button>
+            <p id="statusMessage"></p>
+        </form>
+    </div>
 
     <script>
         // ★重要: ここにLINE Developersで取得したあなたのLIFF IDを設定してください★
-        // 例: const liffId = '2000000000-XXXXXXXX';
-        const liffId = '2007576580-4q0azmME'; // <-- ★ここを必ず自分のLIFF IDに置き換える！
+        const liffId = '2007576580-4q0azmME'; 
+        // ★重要: ここにGASでデプロイしたウェブアプリのURLを設定してください★
+        const gasWebhookUrl = 'https://script.google.com/a/macros/race-tech.co.jp/s/AKfycbwGu07y4rVxqCzQjtkQRQb8uwJ3I5hXK7InagPLlWzlDDCQYZoF3W-nF_YtZmWZjvOMcg/exec'; 
 
-        // LIFF SDKが読み込まれているかを確認するための簡易チェック
+        const statusMessage = document.getElementById('statusMessage');
+        const fileInput = document.getElementById('fileInput');
+        const fileListDiv = document.getElementById('fileList');
+        const uploadedFiles = []; // ファイルデータをBase64で保持する配列
+
+        // ファイル選択時の処理
+        fileInput.addEventListener('change', (event) => {
+            const files = event.target.files;
+            if (uploadedFiles.length + files.length > 3) {
+                alert('添付できるファイルは最大3つまでです。');
+                return;
+            }
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        // Base64エンコードされたデータとファイル情報を保存
+                        uploadedFiles.push({
+                            name: file.name,
+                            type: file.type,
+                            data: e.target.result // Base64データ
+                        });
+                        renderFileList();
+                    };
+                    reader.readAsDataURL(file); // ファイルをBase64に変換
+                }
+            }
+            fileInput.value = ''; // ファイル選択をリセット
+        });
+
+        // ファイルリストの表示を更新
+        function renderFileList() {
+            fileListDiv.innerHTML = '';
+            uploadedFiles.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.classList.add('file-item');
+                fileItem.innerHTML = `
+                    <span>${file.name} (${(file.data.length / 1024 / 1024).toFixed(2)} MB)</span>
+                    <button type="button" data-index="${index}">削除</button>
+                `;
+                fileItem.querySelector('button').addEventListener('click', (e) => {
+                    const idxToRemove = parseInt(e.target.dataset.index);
+                    uploadedFiles.splice(idxToRemove, 1);
+                    renderFileList();
+                });
+                fileListDiv.appendChild(fileItem);
+            });
+        }
+
+
+        // LIFF初期化処理
         if (typeof liff === 'undefined') {
             console.error("エラー: LIFF SDKが読み込まれていません。スクリプトタグを確認してください。");
             document.getElementById('userName').innerText = 'エラー: LIFF SDKが読み込めません。';
             document.getElementById('chatRoomId').innerText = 'コンソールを確認してください。';
-            // ここで処理を中断
         } else {
-            console.log("LIFF SDKは正常に読み込まれています。");
-            console.log('設定されたLIFF ID:', liffId);
-
-            // LIFFアプリの初期化
-            liff.init({
-                liffId: liffId 
-            })
+            liff.init({ liffId: liffId })
             .then(() => {
                 console.log("LIFF initialization successful!");
                 document.getElementById('userName').classList.remove('loading');
                 document.getElementById('chatRoomId').classList.remove('loading');
 
                 if (liff.isLoggedIn()) {
-                    console.log("LIFF is logged in.");
-
-                    // ユーザー情報を取得
                     liff.getProfile().then(profile => {
                         document.getElementById('userName').innerText = profile.displayName;
-                        console.log('User Profile:', profile);
                     }).catch(err => {
                         console.error("Error getting profile: ", err);
                         document.getElementById('userName').innerText = 'ユーザー名取得エラー';
                     });
 
-                    // トークルームIDを取得（チャットまたはグループから開かれた場合のみ）
                     const context = liff.getContext();
                     if (context) {
-                        console.log('LIFF Context:', context);
                         if (context.type === 'chat' || context.type === 'room') {
                             document.getElementById('chatRoomId').innerText = context.chatId;
                         } else {
@@ -91,15 +274,9 @@ color: #888;
                         }
                     } else {
                         document.getElementById('chatRoomId').innerText = '（LIFFコンテキストが取得できません）';
-                        console.warn('LIFF context is null.');
                     }
-
                 } else {
-                    console.warn("LIFFはログインしていません。自動ログインを試みます...");
-                    document.getElementById('userName').innerText = 'LIFFにログインしていません。';
-                    document.getElementById('chatRoomId').innerText = '（自動ログインを試みます）';
-                    liff.login(); // ここでliff.login()を呼び出す
-                    // ログインが成功すると、ページがリロードされ、再度initから処理が開始されます
+                    liff.login(); 
                 }
             })
             .catch((err) => {
@@ -108,7 +285,104 @@ color: #888;
                 document.getElementById('chatRoomId').innerText = '（詳細はコンソールを確認）';
             });
         }
+
+        // フォーム送信処理
+        document.getElementById('orderForm').addEventListener('submit', async (e) => {
+            e.preventDefault(); // デフォルトのフォーム送信を防止
+
+            statusMessage.innerText = '';
+            statusMessage.classList.remove('error');
+
+            if (!liff.isLoggedIn()) {
+                statusMessage.innerText = 'LIFFにログインしていません。ログイン後に再度お試しください。';
+                statusMessage.classList.add('error');
+                liff.login();
+                return;
+            }
+
+            const formData = {
+                companyName: document.getElementById('companyName').value,
+                fullName: document.getElementById('fullName').value,
+                email: document.getElementById('email').value,
+                phoneNumber: document.getElementById('phoneNumber').value,
+                orderContent: document.getElementById('orderContent').value,
+                notes: document.getElementById('notes').value,
+                deliveryDate: document.getElementById('deliveryDate').value,
+                scaffoldDate: document.getElementById('scaffoldDate').value,
+                jotoDate: document.getElementById('jotoDate').value
+            };
+
+            // 必須項目チェック
+            const requiredFields = {
+                companyName: '会社名',
+                fullName: '氏名',
+                email: 'メールアドレス',
+                phoneNumber: '電話番号',
+                orderContent: '注文内容',
+                deliveryDate: '配送日',
+                jotoDate: '上棟日'
+            };
+
+            for (const key in requiredFields) {
+                if (!formData[key]) {
+                    statusMessage.innerText = `${requiredFields[key]}は必須項目です。`;
+                    statusMessage.classList.add('error');
+                    return;
+                }
+            }
+
+            statusMessage.innerText = 'ご注文を送信中...';
+            statusMessage.style.color = 'orange';
+            document.getElementById('submitOrder').disabled = true; // 送信ボタンを無効化
+
+            try {
+                const profile = await liff.getProfile();
+                const userId = profile.userId;
+                const idToken = liff.getIDToken();
+
+                if (!idToken) {
+                    statusMessage.innerText = 'LIFF IDトークンが取得できませんでした。';
+                    statusMessage.classList.add('error');
+                    document.getElementById('submitOrder').disabled = false;
+                    return;
+                }
+
+                const postData = {
+                    userId: userId,
+                    idToken: idToken,
+                    formData: formData,
+                    files: uploadedFiles // 添付ファイルデータ
+                };
+
+                const response = await fetch(gasWebhookUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(postData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    statusMessage.innerText = 'ご注文が送信されました！LINEに確認メッセージが送られました。';
+                    statusMessage.style.color = 'green';
+                    setTimeout(() => {
+                        liff.closeWindow(); // 成功後、LIFFアプリを閉じる
+                    }, 2000); // 2秒後に閉じる
+                } else {
+                    statusMessage.innerText = `ご注文送信に失敗しました: ${result.message}`;
+                    statusMessage.classList.add('error');
+                    console.error('Failed to submit order:', result.error);
+                }
+            } catch (error) {
+                statusMessage.innerText = `注文送信中にエラーが発生しました: ${error.message}`;
+                statusMessage.classList.add('error');
+                console.error('Error submitting order:', error);
+            } finally {
+                document.getElementById('submitOrder').disabled = false; // 送信ボタンを再度有効化
+            }
+        });
     </script>
 </body>
 </html>
-```
