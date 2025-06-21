@@ -87,7 +87,7 @@
         const liffId = '2007576580-4q0azmME'; 
 
         // ★重要: ここにGASでデプロイしたウェブアプリのURLを設定してください★
-        const gasWebhookUrl = 'https://script.google.com/macros/s/AKfycbxOFXwA5whfR7qYhxnEzkmr4zR7CfyrcBqxm6L-ucu_1TlvCWV41hTyFyuCi7z4zp-7/exec'; 
+        const gasWebhookUrl = 'https://script.google.com/macros/s/AKfycbwE3fC57BvtnTRXC5e-niY9kbwMlUj9vUWYyAlRtzXHmuSm5Rg9MAN5V0rpDn1oQf0/exec'; 
 
         const statusMessage = document.getElementById('statusMessage');
         let currentUserName = '未取得';
@@ -117,15 +117,23 @@
 
                     const context = liff.getContext();
                     if (context) {
+                        // トークルームIDが取得できる場合
                         if (context.type === 'chat' || context.type === 'room') {
                             currentChatRoomId = context.chatId;
                             document.getElementById('chatRoomId').innerText = currentChatRoomId;
-                        } else {
-                            currentChatRoomId = `（チャット/グループ以外から開かれました: ${context.type}）`;
+                            console.log('Chat Room ID:', currentChatRoomId);
+                        } 
+                        // トークルームIDが取得できないが、LIFFが開かれたコンテキストがある場合（例: utou）
+                        else {
+                            currentChatRoomId = `（${context.type}から開かれました）`;
                             document.getElementById('chatRoomId').innerText = currentChatRoomId;
+                            console.log('Context Type (no Chat ID):', context.type);
                         }
                     } else {
-                        document.getElementById('chatRoomId').innerText = '（LIFFコンテキストが取得できません）';
+                        // LIFFコンテキスト自体が取得できない場合
+                        currentChatRoomId = '（LIFFコンテキストが取得できません）';
+                        document.getElementById('chatRoomId').innerText = currentChatRoomId;
+                        console.warn('LIFF context is null.');
                     }
                 } else {
                     liff.login(); 
