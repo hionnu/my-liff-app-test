@@ -38,7 +38,7 @@
             margin: 10px 0;
             font-size: 1.1em;
         }
-        #userName, #chatRoomId {
+        #userIdDisplay, #userNameDisplay, #chatRoomIdDisplay { /* ID名を変更 */
             font-weight: bold;
             color: #007bff;
         }
@@ -74,8 +74,9 @@
     <div class="container">
         <h1>LINE情報記録</h1>
         <div class="info-section">
-            <p>ユーザー名: <span id="userName" class="loading">読み込み中...</span></p>
-            <p>トークルームID: <span id="chatRoomId" class="loading">読み込み中...</span></p>
+            <p>ユーザーID: <span id="userIdDisplay" class="loading">読み込み中...</span></p>
+            <p>ユーザー名: <span id="userNameDisplay" class="loading">読み込み中...</span></p>
+            <p>トークルームID: <span id="chatRoomIdDisplay" class="loading">読み込み中...</span></p>
         </div>
         
         <button id="submitData">スプレッドシートに記録する</button>
@@ -87,52 +88,54 @@
         const liffId = '2007576580-4q0azmME'; 
 
         // ★重要: ここにGASでデプロイしたウェブアプリのURLを設定してください★
-        const gasWebhookUrl = 'https://script.google.com/macros/s/AKfycbwE3fC57BvtnTRXC5e-niY9kbwMlUj9vUWYyAlRtzXHmuSm5Rg9MAN5V0rpDn1oQf0/exec'; 
+        const gasWebhookUrl = 'https://script.google.com/macros/s/AKfycbwcdQ1ZscDfClRMW9ijFGvRSXsPG5zRRHFthlISuJAtx1B3o8Ub7wiC9VepJxn5pwCX/exec'; 
 
         const statusMessage = document.getElementById('statusMessage');
+        let currentUserId = '未取得'; // UserIDを格納する変数
         let currentUserName = '未取得';
         let currentChatRoomId = '未取得';
 
         // LIFF初期化処理
         if (typeof liff === 'undefined') {
             console.error("エラー: LIFF SDKが読み込まれていません。スクリプトタグを確認してください。");
-            document.getElementById('userName').innerText = 'エラー: LIFF SDKが読み込めません。';
-            document.getElementById('chatRoomId').innerText = 'コンソールを確認してください。';
+            document.getElementById('userIdDisplay').innerText = 'エラー: SDK読み込み失敗';
+            document.getElementById('userNameDisplay').innerText = 'エラー: SDK読み込み失敗';
+            document.getElementById('chatRoomIdDisplay').innerText = 'コンソールを確認してください。';
         } else {
             liff.init({ liffId: liffId })
             .then(() => {
                 console.log("LIFF initialization successful!");
-                document.getElementById('userName').classList.remove('loading');
-                document.getElementById('chatRoomId').classList.remove('loading');
+                document.getElementById('userIdDisplay').classList.remove('loading');
+                document.getElementById('userNameDisplay').classList.remove('loading');
+                document.getElementById('chatRoomIdDisplay').classList.remove('loading');
 
                 if (liff.isLoggedIn()) {
                     liff.getProfile().then(profile => {
+                        currentUserId = profile.userId; // UserIDを取得
                         currentUserName = profile.displayName;
-                        document.getElementById('userName').innerText = currentUserName;
+                        document.getElementById('userIdDisplay').innerText = currentUserId;
+                        document.getElementById('userNameDisplay').innerText = currentUserName;
                         console.log('User Profile:', profile);
                     }).catch(err => {
                         console.error("Error getting profile: ", err);
-                        document.getElementById('userName').innerText = 'ユーザー名取得エラー';
+                        document.getElementById('userIdDisplay').innerText = '取得エラー';
+                        document.getElementById('userNameDisplay').innerText = '取得エラー';
                     });
 
                     const context = liff.getContext();
                     if (context) {
-                        // トークルームIDが取得できる場合
                         if (context.type === 'chat' || context.type === 'room') {
                             currentChatRoomId = context.chatId;
-                            document.getElementById('chatRoomId').innerText = currentChatRoomId;
+                            document.getElementById('chatRoomIdDisplay').innerText = currentChatRoomId;
                             console.log('Chat Room ID:', currentChatRoomId);
-                        } 
-                        // トークルームIDが取得できないが、LIFFが開かれたコンテキストがある場合（例: utou）
-                        else {
+                        } else {
                             currentChatRoomId = `（${context.type}から開かれました）`;
-                            document.getElementById('chatRoomId').innerText = currentChatRoomId;
+                            document.getElementById('chatRoomIdDisplay').innerText = currentChatRoomId;
                             console.log('Context Type (no Chat ID):', context.type);
                         }
                     } else {
-                        // LIFFコンテキスト自体が取得できない場合
                         currentChatRoomId = '（LIFFコンテキストが取得できません）';
-                        document.getElementById('chatRoomId').innerText = currentChatRoomId;
+                        document.getElementById('chatRoomIdDisplay').innerText = currentChatRoomId;
                         console.warn('LIFF context is null.');
                     }
                 } else {
@@ -141,8 +144,9 @@
             })
             .catch((err) => {
                 console.error("LIFF初期化に失敗しました: ", err);
-                document.getElementById('userName').innerText = 'LIFF初期化エラー';
-                document.getElementById('chatRoomId').innerText = '（詳細はコンソールを確認）';
+                document.getElementById('userIdDisplay').innerText = '初期化エラー';
+                document.getElementById('userNameDisplay').innerText = '初期化エラー';
+                document.getElementById('chatRoomIdDisplay').innerText = '（詳細はコンソールを確認）';
             });
         }
 
@@ -158,7 +162,7 @@
                 return;
             }
             
-            if (currentUserName === '未取得' || currentChatRoomId === '未取得') {
+            if (currentUserId === '未取得' || currentUserName === '未取得' || currentChatRoomId === '未取得') {
                 statusMessage.innerText = 'ユーザー情報がまだ取得できていません。少し待ってから再度お試しください。';
                 statusMessage.classList.add('error');
                 return;
@@ -170,11 +174,12 @@
 
             try {
                 const postData = {
+                    userId: currentUserId, // UserIDを送信
                     userName: currentUserName,
                     chatRoomId: currentChatRoomId
                 };
 
-                console.log("Sending data to GAS:", postData); // 送信データをコンソールにログ出力
+                console.log("Sending data to GAS:", postData);
 
                 const response = await fetch(gasWebhookUrl, {
                     method: 'POST',
@@ -184,39 +189,35 @@
                     body: JSON.stringify(postData)
                 });
                 
-                // レスポンスのHTTPステータスコードをチェック
                 if (!response.ok) {
-                    const errorText = await response.text(); // テキストとしてエラー内容を取得
+                    const errorText = await response.text();
                     console.error('HTTP Error Status:', response.status);
                     console.error('HTTP Error Text:', errorText);
                     throw new Error(`GASからのHTTPエラー: ${response.status} - ${errorText}`);
                 }
 
-                const result = await response.json(); // JSONとして解析
+                const result = await response.json();
 
                 if (result.success) {
                     statusMessage.innerText = 'データがスプレッドシートに正常に記録されました！';
                     statusMessage.style.color = 'green';
                     setTimeout(() => {
-                        liff.closeWindow(); // 成功後、LIFFアプリを閉じる
-                    }, 2000); // 2秒後に閉じる
+                        liff.closeWindow(); 
+                    }, 2000); 
                 } else {
-                    // GASから返されたエラーメッセージを表示
                     statusMessage.innerText = `データ記録に失敗しました: ${result.message || '不明なエラー'}`;
                     statusMessage.classList.add('error');
                     console.error('Failed to record data (GAS response):', result.error);
                 }
             } catch (error) {
-                // 'Failed to fetch' やその他のネットワークエラーをここで捕捉
                 statusMessage.innerText = `データ送信中にエラーが発生しました: ${error.message}`;
                 statusMessage.classList.add('error');
                 console.error('Error submitting data:', error);
-                // ネットワークエラーの場合、URLが間違っていないか、CORS設定は正しいか確認を促す
                 if (error.message.includes('Failed to fetch')) {
                     statusMessage.innerText += '\n(ヒント: GASのURLが正しいか、GASのデプロイとCORS設定を確認してください)';
                 }
             } finally {
-                document.getElementById('submitData').disabled = false; // 送信ボタンを再度有効化
+                document.getElementById('submitData').disabled = false; 
             }
         });
     </script>
