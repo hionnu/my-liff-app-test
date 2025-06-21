@@ -67,6 +67,11 @@
         .error {
             color: red;
         }
+        #versionInfo { /* バージョン情報のスタイル */
+            margin-top: 20px;
+            font-size: 0.8em;
+            color: #777;
+        }
     </style>
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 </head>
@@ -81,16 +86,17 @@
         
         <button id="submitData">スプレッドシートに記録する</button>
         <p id="statusMessage"></p>
-    </div>
+        <p id="versionInfo"></p> </div>
 
     <script>
         // ★重要: ここにLINE Developersで取得したあなたのLIFF IDを設定してください★
-        const liffId = '2007576580-4q0azmME'; // 例: '2007576580-4q0azmME'; 
+        const liffId = '2007576580-4q0azmME'; 
 
         // ★重要: ここにGASでデプロイしたウェブアプリのURLを設定してください★
-        const gasWebhookUrl = 'https://script.google.com/macros/s/AKfycbwU9KxG8NZZxJt_aiPUB0noKnJgQKDuVKDW-VYJ6pD5WjUVmIvsqHKO1K3IRoTO_gTH/exec'; // 例: 'https://script.google.com/macros/s/AKfycbxR76bPIJfXQppnhqAVBWYPZFU_uvnUdQ917O53a3_ASCcvoFSH8HtnXYgXFyykLaJa/exec';
+        const gasWebhookUrl = 'https://script.google.com/macros/s/AKfycbzzY9O2y3bszcB7RJWiOu5CeKx-00qddAFJ1n5QkAV9wL9mwO9cEgIjOY_1HHkGBLK_/exec'; 
 
         const statusMessage = document.getElementById('statusMessage');
+        const versionInfoElement = document.getElementById('versionInfo'); // 新しく追加
         let currentUserId = '未取得'; 
         let currentUserName = '未取得';
         let currentChatRoomId = '未取得';
@@ -98,10 +104,16 @@
         // アクセス通知を一度だけ送信するためのフラグ
         let accessNotified = false; 
 
+        // バージョン情報を表示
+        const now = new Date();
+        const versionString = `Ver. ${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}-${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}${now.getSeconds().toString().padStart(2, '0')}`;
+        versionInfoElement.innerText = versionString;
+
+
         // GASへのPOSTリクエスト送信ヘルパー関数
         async function sendToGas(action, data) {
             try {
-                const postData = { action: action, ...data }; // actionフィールドを追加
+                const postData = { action: action, ...data }; 
                 console.log(`Sending ${action} data to GAS:`, postData);
 
                 const response = await fetch(gasWebhookUrl, {
@@ -123,7 +135,6 @@
 
             } catch (error) {
                 console.error(`Error in sendToGas (${action}):`, error);
-                // エラーメッセージをHTML表示するため、ここでthrowする
                 throw error; 
             }
         }
@@ -137,14 +148,14 @@
             document.getElementById('chatRoomIdDisplay').innerText = 'コンソールを確認してください。';
         } else {
             liff.init({ liffId: liffId })
-            .then(async () => { // asyncを追加
+            .then(async () => { 
                 console.log("LIFF initialization successful!");
                 document.getElementById('userIdDisplay').classList.remove('loading');
                 document.getElementById('userNameDisplay').classList.remove('loading');
                 document.getElementById('chatRoomIdDisplay').classList.remove('loading');
 
                 if (liff.isLoggedIn()) {
-                    const profile = await liff.getProfile(); // awaitを追加
+                    const profile = await liff.getProfile(); 
                     currentUserId = profile.userId; 
                     currentUserName = profile.displayName;
                     document.getElementById('userIdDisplay').innerText = currentUserId;
@@ -172,14 +183,12 @@
                             const result = await sendToGas('notify_access', { userId: currentUserId });
                             if (result.success) {
                                 console.log('Access notification sent successfully.');
-                                accessNotified = true; // 送信済みフラグを立てる
+                                accessNotified = true; 
                             } else {
                                 console.error('Failed to send access notification:', result.message);
-                                // HTML上にエラーを表示しないが、コンソールにはログを残す
                             }
                         } catch (notifyError) {
                             console.error('Error sending access notification:', notifyError);
-                            // HTML上にエラーを表示しないが、コンソールにはログを残す
                         }
                     }
 
@@ -215,7 +224,7 @@
 
             statusMessage.innerText = 'データを送信中...';
             statusMessage.style.color = 'orange';
-            document.getElementById('submitData').disabled = true; // 送信ボタンを無効化
+            document.getElementById('submitData').disabled = true; 
 
             try {
                 const result = await sendToGas('record_data', {
