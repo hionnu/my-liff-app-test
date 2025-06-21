@@ -4,10 +4,62 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>スタイリッシュ注文フォーム</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <link rel="stylesheet" href="css/style.css">
-    
+    <style>
+        /* カスタムカラー設定 for Tailwind JIT */
+        /* 画像の明るい雰囲気とコーポレートカラーを基に再定義 */
+        :root {
+            /* ベースカラー (明るいトーン) */
+            --color-primary-bg: #F8F9FA;   /* 非常に明るい背景色 (ほぼ白) */
+            --color-card-bg: #FFFFFF;     /* カードの背景色 (純白) */
+            --color-text-dark: #212529;    /* 主要なテキスト色 (濃いグレー) */
+            --color-text-muted: #6C757D;   /* 控えめなテキスト色 (中間グレー) */
+            --color-border-subtle: #DEE2E6; /* 微妙なボーダー色 */
+
+            /* コーポレートカラー (明るく、活気のあるトーン) */
+            --color-corporate-green: #28A745; /* 強めの緑 */
+            --color-corporate-green-light: #E9F8EE; /* 非常に明るい緑 (背景用) */
+            --color-corporate-blue: #007BFF;  /* 強めの青 */
+            --color-corporate-blue-light: #E0EFFE; /* 非常に明るい青 (背景用) */
+
+            /* ボタンやアクセント用のシャドウ */
+            --shadow-md-custom: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg-custom: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .bg-primary-bg { background-color: var(--color-primary-bg); }
+        .bg-card-bg { background-color: var(--color-card-bg); }
+        .text-text-dark { color: var(--color-text-dark); }
+        .text-text-muted { color: var(--color-text-muted); }
+        .border-border-subtle { border-color: var(--color-border-subtle); }
+        
+        .bg-corporate-green { background-color: var(--color-corporate-green); }
+        .bg-corporate-green-light { background-color: var(--color-corporate-green-light); }
+        .text-corporate-green { color: var(--color-corporate-green); }
+        .bg-corporate-blue { background-color: var(--color-corporate-blue); }
+        .bg-corporate-blue-light { background-color: var(--color-corporate-blue-light); }
+        .text-corporate-blue { color: var(--color-corporate-blue); }
+
+        /* フォーカスリングの色をコーポレートブルーに */
+        .focus-ring-corporate-blue:focus { 
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.4); /* RGBA for transparency */
+            border-color: var(--color-corporate-blue); 
+        }
+
+        /* カスタムシャドウ */
+        .shadow-md-custom { box-shadow: var(--shadow-md-custom); }
+        .shadow-lg-custom { box-shadow: var(--shadow-lg-custom); }
+
+        /* Inter フォントの読み込み */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Bootstrap Icons CDN */
+        @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css");
+    </style>
+    <!-- LIFF SDK -->
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 </head>
 <body class="bg-primary-bg min-h-screen flex items-center justify-center p-4">
@@ -16,6 +68,7 @@
             <i class="bi bi-box-seam inline-block align-middle text-corporate-green mr-3"></i> 注文受付フォーム
         </h1>
 
+        <!-- ユーザー情報セクション -->
         <div class="bg-corporate-blue-light rounded-xl p-5 mb-8 shadow-md-custom text-base md:text-lg border border-corporate-blue">
             <p class="text-text-dark mb-2 flex items-center">
                 <i class="bi bi-person-fill text-corporate-blue mr-3 text-xl"></i>
@@ -27,7 +80,9 @@
             </p>
         </div>
 
+        <!-- 注文フォーム -->
         <form id="orderForm" class="space-y-6">
+            <!-- 会社名・氏名 -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="form-group">
                     <label for="companyName" class="block text-text-dark text-sm font-semibold mb-2 required">
@@ -47,6 +102,7 @@
                 </div>
             </div>
 
+            <!-- メールアドレス・電話番号 -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="form-group">
                     <label for="email" class="block text-text-dark text-sm font-semibold mb-2 required">
@@ -66,6 +122,7 @@
                 </div>
             </div>
 
+            <!-- 注文内容 -->
             <div class="form-group">
                 <label for="orderContent" class="block text-text-dark text-sm font-semibold mb-2 required">
                     <i class="bi bi-card-text text-corporate-green mr-2"></i> 注文内容
@@ -75,6 +132,7 @@
                                  focus:outline-none focus:ring-2 focus:ring-corporate-blue focus-ring-corporate-blue text-base"></textarea>
             </div>
 
+            <!-- 特記事項 -->
             <div class="form-group">
                 <label for="notes" class="block text-text-dark text-sm font-semibold mb-2">
                     <i class="bi bi-journal-text text-corporate-green mr-2"></i> 特記事項 (任意)
@@ -84,6 +142,7 @@
                                  focus:outline-none focus:ring-2 focus:ring-corporate-blue focus-ring-corporate-blue text-base"></textarea>
             </div>
 
+            <!-- 日付関連 -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="form-group">
                     <label for="deliveryDate" class="block text-text-dark text-sm font-semibold mb-2 required">
@@ -111,6 +170,7 @@
                 </div>
             </div>
             
+            <!-- New File Upload Section -->
             <div class="form-group bg-corporate-green-light p-6 rounded-xl shadow-md-custom border border-corporate-green">
                 <label class="block text-text-dark text-lg font-semibold mb-3">
                     <i class="bi bi-paperclip text-corporate-green mr-2"></i> 添付ファイル (任意, 最大3つまで)
@@ -120,7 +180,8 @@
                               file:rounded-full file:border-0 file:text-sm file:font-semibold
                               file:bg-corporate-blue file:text-white hover:file:bg-blue-700 cursor-pointer">
                 <div id="fileList" class="mt-4 space-y-2 text-text-muted text-sm">
-                    </div>
+                    <!-- 選択されたファイルが表示される -->
+                </div>
             </div>
 
             <button type="submit" id="submitOrder"
@@ -143,8 +204,7 @@
 
         const userIdDisplay = document.getElementById('userIdDisplay');
         const userNameDisplay = document.getElementById('userNameDisplay');
-        // HTMLから削除されたため、chatRoomIdDisplayへの参照は不要です
-        // const chatRoomIdDisplay = document.getElementById('chatRoomIdDisplay'); 
+        // chatRoomIdDisplay はHTMLから削除されましたが、JS変数としては保持
         const statusMessage = document.getElementById('statusMessage');
         const versionInfoElement = document.getElementById('versionInfo'); 
         const submitOrderButton = document.getElementById('submitOrder');
@@ -153,7 +213,7 @@
 
         let currentUserId = '未取得'; 
         let currentUserName = '未取得';
-        let currentChatRoomId = '未取得'; // この変数はバックエンド送信のために保持
+        let currentChatRoomId = '未取得'; 
         let accessNotified = false; 
         const uploadedFiles = []; // ファイルデータをBase64で保持する配列
 
@@ -292,13 +352,9 @@
                         } else {
                             currentChatRoomId = `（${context.type}から開かれました）`;
                         }
-                        // HTMLからは削除されたが、console.logのため保持
-                        // chatRoomIdDisplay.innerText = currentChatRoomId; 
                         console.log('LIFF Context:', context);
                     } else {
                         currentChatRoomId = '（LIFFコンテキストが取得できません）';
-                        // HTMLからは削除されたが、console.logのため保持
-                        // chatRoomIdDisplay.innerText = currentChatRoomId; 
                         console.warn('LIFF context is null.');
                     }
 
@@ -317,6 +373,35 @@
                         }
                     }
 
+                    // ★ユーザーIDが取得できたら、スプレッドシートから既存のプロフィールを読み込み自動入力★
+                    if (currentUserId !== '未取得') {
+                        try {
+                            const result = await sendToCloudFunction('get_user_profile', { userId: currentUserId });
+                            if (result.success && result.data) {
+                                document.getElementById('companyName').value = result.data.companyName || '';
+                                document.getElementById('fullName').value = result.data.fullName || '';
+                                document.getElementById('email').value = result.data.email || '';
+                                document.getElementById('phoneNumber').value = result.data.phoneNumber || '';
+                                statusMessage.innerText = '前回の情報が自動入力されました。';
+                                statusMessage.classList.remove('text-red-500');
+                                statusMessage.classList.add('text-text-muted'); // 控えめな色
+                            } else if (result.success && !result.data) {
+                                statusMessage.innerText = '初回利用、または既存の情報が見つかりませんでした。';
+                                statusMessage.classList.remove('text-red-500');
+                                statusMessage.classList.add('text-text-muted');
+                            } else {
+                                console.error('Failed to get user profile:', result.message);
+                                statusMessage.innerText = `情報取得エラー: ${result.message || '不明'}`;
+                                statusMessage.classList.add('error', 'text-red-500');
+                            }
+                        } catch (profileError) {
+                            console.error('Error getting user profile for autofill:', profileError);
+                            statusMessage.innerText = `情報取得中にエラー: ${profileError.message || '不明'}`;
+                            statusMessage.classList.add('error', 'text-red-500');
+                        }
+                    }
+
+
                 } else {
                     liff.login(); 
                 }
@@ -325,8 +410,6 @@
                 console.error("LIFF初期化に失敗しました: ", err);
                 userIdDisplay.innerText = '初期化エラー';
                 userNameDisplay.innerText = '初期化エラー';
-                // HTMLから削除されたため、この行も削除
-                // chatRoomIdDisplay.innerText = '（詳細はコンソールを確認）'; 
             });
         }
 
