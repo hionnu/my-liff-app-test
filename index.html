@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>LINE情報記録アプリ</title>
+    <title>注文フォーム</title>
     <style>
         body {
             font-family: sans-serif;
@@ -21,53 +21,78 @@
             padding: 25px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            max-width: 400px;
-            width: 100%;
-            text-align: center;
+            max-width: 600px;
+            margin: 20px auto;
         }
-        h1 {
+        h1, h2 {
+            text-align: center;
             color: #333;
-            margin-bottom: 20px;
         }
         .info-section {
             margin-bottom: 20px;
             padding-bottom: 15px;
             border-bottom: 1px solid #eee;
+            text-align: center;
         }
         .info-section p {
-            margin: 10px 0;
-            font-size: 1.1em;
+            margin: 5px 0;
+            font-size: 0.95em;
         }
-        #userIdDisplay, #userNameDisplay, #chatRoomIdDisplay { 
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
             font-weight: bold;
-            color: #007bff;
         }
-        .loading {
-            color: #888;
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="tel"],
+        .form-group input[type="number"],
+        .form-group input[type="date"],
+        .form-group textarea,
+        .form-group select {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1em;
+            box-sizing: border-box; /* パディングを含めて幅を計算 */
         }
-        button#submitData {
-            background-color: #28a745;
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .form-group .required::after {
+            content: " *";
+            color: red;
+        }
+
+        button#submitOrder {
+            background-color: #007bff;
             color: white;
             padding: 12px 20px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             font-size: 1.1em;
-            margin-top: 20px;
+            margin-top: 30px;
             width: 100%;
         }
-        button#submitData:hover {
-            background-color: #218838;
+        button#submitOrder:hover {
+            background-color: #0056b3;
         }
         #statusMessage {
             margin-top: 20px;
             font-weight: bold;
+            text-align: center;
             color: green;
         }
         .error {
             color: red;
         }
-        #versionInfo { /* バージョン情報のスタイル */
+        #versionInfo { 
             margin-top: 20px;
             font-size: 0.8em;
             color: #777;
@@ -77,31 +102,70 @@
 </head>
 <body>
     <div class="container">
-        <h1>LINE情報記録</h1>
+        <h1>注文受付フォーム</h1>
         <div class="info-section">
             <p>ユーザーID: <span id="userIdDisplay" class="loading">読み込み中...</span></p>
             <p>ユーザー名: <span id="userNameDisplay" class="loading">読み込み中...</span></p>
             <p>トークルームID: <span id="chatRoomIdDisplay" class="loading">読み込み中...</span></p>
         </div>
-        
-        <button id="submitData">スプレッドシートに記録する</button>
-        <p id="statusMessage"></p>
-        <p id="versionInfo"></p> </div>
+
+        <form id="orderForm">
+            <div class="form-group">
+                <label for="companyName" class="required">会社名</label>
+                <input type="text" id="companyName" required>
+            </div>
+            <div class="form-group">
+                <label for="fullName" class="required">氏名</label>
+                <input type="text" id="fullName" required>
+            </div>
+            <div class="form-group">
+                <label for="email" class="required">メールアドレス</label>
+                <input type="email" id="email" required>
+            </div>
+            <div class="form-group">
+                <label for="phoneNumber" class="required">電話番号</label>
+                <input type="tel" id="phoneNumber" pattern="[0-9\-]+" title="半角数字とハイフンのみ" required>
+            </div>
+            <div class="form-group">
+                <label for="orderContent" class="required">注文内容</label>
+                <textarea id="orderContent" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="notes">特記事項 (任意)</label>
+                <textarea id="notes"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="deliveryDate" class="required">配送日</label>
+                <input type="date" id="deliveryDate" required>
+            </div>
+            <div class="form-group">
+                <label for="scaffoldDate">足場組立日 (任意)</label>
+                <input type="date" id="scaffoldDate">
+            </div>
+            <div class="form-group">
+                <label for="jotoDate" class="required">上棟日</label>
+                <input type="date" id="jotoDate" required>
+            </div>
+            
+            <button type="submit" id="submitOrder">注文する</button>
+            <p id="statusMessage"></p>
+        </form>
+        <p id="versionInfo"></p>
+    </div>
 
     <script>
         // ★重要: ここにLINE Developersで取得したあなたのLIFF IDを設定してください★
-        const liffId = '2007576580-4q0azmME'; 
+        const liffId = 'YOUR_LIFF_ID'; 
 
-        // ★重要: ここにGASでデプロイしたウェブアプリのURLを設定してください★
-        const gasWebhookUrl = 'https://handle-liff-order-request-261123846998.asia-northeast1.run.app'; 
+        // ★重要: ここにGoogle Cloud Functionsでデプロイした関数のURLを設定してください★
+        const cloudFunctionUrl = 'https://handle-liff-order-request-261123846998.asia-northeast1.run.app'; 
 
         const statusMessage = document.getElementById('statusMessage');
-        const versionInfoElement = document.getElementById('versionInfo'); // 新しく追加
+        const versionInfoElement = document.getElementById('versionInfo'); 
         let currentUserId = '未取得'; 
         let currentUserName = '未取得';
         let currentChatRoomId = '未取得';
 
-        // アクセス通知を一度だけ送信するためのフラグ
         let accessNotified = false; 
 
         // バージョン情報を表示
@@ -110,13 +174,13 @@
         versionInfoElement.innerText = versionString;
 
 
-        // GASへのPOSTリクエスト送信ヘルパー関数
-        async function sendToGas(action, data) {
+        // Cloud FunctionsへのPOSTリクエスト送信ヘルパー関数
+        async function sendToCloudFunction(action, data) {
             try {
                 const postData = { action: action, ...data }; 
-                console.log(`Sending ${action} data to GAS:`, postData);
+                console.log(`Sending ${action} data to Cloud Function:`, postData);
 
-                const response = await fetch(gasWebhookUrl, {
+                const response = await fetch(cloudFunctionUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(postData)
@@ -126,15 +190,15 @@
                     const errorText = await response.text();
                     console.error('HTTP Error Status:', response.status);
                     console.error('HTTP Error Text:', errorText);
-                    throw new Error(`GASからのHTTPエラー: ${response.status} - ${errorText}`);
+                    throw new Error(`Cloud FunctionsからのHTTPエラー: ${response.status} - ${errorText}`);
                 }
 
                 const result = await response.json();
-                console.log(`GAS response for ${action}:`, result);
+                console.log(`Cloud Functions response for ${action}:`, result);
                 return result;
 
             } catch (error) {
-                console.error(`Error in sendToGas (${action}):`, error);
+                console.error(`Error in sendToCloudFunction (${action}):`, error);
                 throw error; 
             }
         }
@@ -180,7 +244,7 @@
                     // ★LIFFにログインし、ユーザーIDが取得できたらアクセス通知を送信★
                     if (!accessNotified && currentUserId !== '未取得') {
                         try {
-                            const result = await sendToGas('notify_access', { userId: currentUserId });
+                            const result = await sendToCloudFunction('notify_access', { userId: currentUserId });
                             if (result.success) {
                                 console.log('Access notification sent successfully.');
                                 accessNotified = true; 
@@ -204,8 +268,10 @@
             });
         }
 
-        // スプレッドシート記録ボタンの処理
-        document.getElementById('submitData').addEventListener('click', async () => {
+        // 注文送信ボタンの処理
+        document.getElementById('orderForm').addEventListener('submit', async (e) => {
+            e.preventDefault(); // デフォルトのフォーム送信を防止
+
             statusMessage.innerText = '';
             statusMessage.classList.remove('error');
 
@@ -222,36 +288,69 @@
                 return;
             }
 
-            statusMessage.innerText = 'データを送信中...';
+            const formData = {
+                companyName: document.getElementById('companyName').value,
+                fullName: document.getElementById('fullName').value,
+                email: document.getElementById('email').value,
+                phoneNumber: document.getElementById('phoneNumber').value,
+                orderContent: document.getElementById('orderContent').value,
+                notes: document.getElementById('notes').value,
+                deliveryDate: document.getElementById('deliveryDate').value,
+                scaffoldDate: document.getElementById('scaffoldDate').value,
+                jotoDate: document.getElementById('jotoDate').value
+            };
+
+            // 必須項目チェック
+            const requiredFields = {
+                companyName: '会社名',
+                fullName: '氏名',
+                email: 'メールアドレス',
+                phoneNumber: '電話番号',
+                orderContent: '注文内容',
+                deliveryDate: '配送日',
+                jotoDate: '上棟日'
+            };
+
+            for (const key in requiredFields) {
+                if (!formData[key]) {
+                    statusMessage.innerText = `${requiredFields[key]}は必須項目です。`;
+                    statusMessage.classList.add('error');
+                    return;
+                }
+            }
+
+            statusMessage.innerText = 'ご注文を送信中...';
             statusMessage.style.color = 'orange';
-            document.getElementById('submitData').disabled = true; 
+            document.getElementById('submitOrder').disabled = true; 
 
             try {
-                const result = await sendToGas('record_data', {
+                const result = await sendToCloudFunction('record_order', { // actionをrecord_orderに
                     userId: currentUserId,
                     userName: currentUserName,
-                    chatRoomId: currentChatRoomId
+                    chatRoomId: currentChatRoomId,
+                    orderDetails: formData // フォームデータをorder_detailsとして送信
                 });
 
                 if (result.success) {
-                    statusMessage.innerText = 'データがスプレッドシートに正常に記録されました！';
+                    statusMessage.innerText = 'ご注文が送信されました！LINEに確認メッセージが送られました。';
                     statusMessage.style.color = 'green';
-                    // スプレッドシート記録成功後にLIFFアプリを閉じる（任意）
-                    // setTimeout(() => { liff.closeWindow(); }, 2000); 
+                    setTimeout(() => {
+                        liff.closeWindow(); 
+                    }, 2000); 
                 } else {
-                    statusMessage.innerText = `データ記録に失敗しました: ${result.message || '不明なエラー'}`;
+                    statusMessage.innerText = `ご注文送信に失敗しました: ${result.message || '不明なエラー'}`;
                     statusMessage.classList.add('error');
-                    console.error('Failed to record data (GAS response):', result.error);
+                    console.error('Failed to submit order (Cloud Functions response):', result.error);
                 }
             } catch (error) {
-                statusMessage.innerText = `データ送信中にエラーが発生しました: ${error.message}`;
+                statusMessage.innerText = `注文送信中にエラーが発生しました: ${error.message}`;
                 statusMessage.classList.add('error');
-                console.error('Error submitting data:', error);
+                console.error('Error submitting order:', error);
                 if (error.message.includes('Failed to fetch')) {
-                    statusMessage.innerText += '\n(ヒント: GASのURLが正しいか、GASのデプロイとCORS設定を確認してください)';
+                    statusMessage.innerText += '\n(ヒント: Cloud FunctionsのURLが正しいか、デプロイとCORS設定を確認してください)';
                 }
             } finally {
-                document.getElementById('submitData').disabled = false; 
+                document.getElementById('submitOrder').disabled = false; 
             }
         });
     </script>
