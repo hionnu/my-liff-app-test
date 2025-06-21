@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>注文フォーム</title>
+    <title>LINE情報記録アプリ</title>
     <style>
         body {
             font-family: sans-serif;
@@ -11,243 +11,87 @@
             padding: 20px;
             background-color: #f0f2f5;
             color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
         .container {
             background-color: white;
             padding: 25px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            max-width: 600px;
-            margin: 20px auto;
-        }
-        h1, h2 {
+            max-width: 400px;
+            width: 100%;
             text-align: center;
+        }
+        h1 {
             color: #333;
+            margin-bottom: 20px;
         }
         .info-section {
             margin-bottom: 20px;
             padding-bottom: 15px;
             border-bottom: 1px solid #eee;
-            text-align: center;
         }
         .info-section p {
-            margin: 5px 0;
-            font-size: 0.95em;
+            margin: 10px 0;
+            font-size: 1.1em;
         }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
+        #userName, #chatRoomId {
             font-weight: bold;
+            color: #007bff;
         }
-        .form-group input[type="text"],
-        .form-group input[type="email"],
-        .form-group input[type="tel"],
-        .form-group input[type="number"],
-        .form-group input[type="date"],
-        .form-group textarea,
-        .form-group select {
-            width: calc(100% - 22px);
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 1em;
-            box-sizing: border-box; /* パディングを含めて幅を計算 */
+        .loading {
+            color: #888;
         }
-        .form-group textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-        .form-group .required::after {
-            content: " *";
-            color: red;
-        }
-        .file-upload-group {
-            border: 1px solid #ddd;
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 15px;
-        }
-        .file-upload-group input[type="file"] {
-            display: block;
-            margin-top: 10px;
-        }
-        .file-list {
-            margin-top: 10px;
-            font-size: 0.9em;
-            color: #666;
-        }
-        .file-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 5px;
-            background-color: #f9f9f9;
-            padding: 5px;
-            border-radius: 3px;
-        }
-        .file-item button {
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            padding: 3px 8px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 0.8em;
-        }
-        .file-item button:hover {
-            background-color: #c82333;
-        }
-
-        button#submitOrder {
-            background-color: #007bff;
+        button#submitData {
+            background-color: #28a745;
             color: white;
             padding: 12px 20px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             font-size: 1.1em;
-            margin-top: 30px;
+            margin-top: 20px;
             width: 100%;
         }
-        button#submitOrder:hover {
-            background-color: #0056b3;
+        button#submitData:hover {
+            background-color: #218838;
         }
         #statusMessage {
             margin-top: 20px;
             font-weight: bold;
-            text-align: center;
             color: green;
-            white-space: pre-wrap; /* 改行を有効にする */
         }
         .error {
             color: red;
-        }
-        .hidden {
-            display: none;
         }
     </style>
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1>注文受付フォーム</h1>
+        <h1>LINE情報記録</h1>
         <div class="info-section">
             <p>ユーザー名: <span id="userName" class="loading">読み込み中...</span></p>
             <p>トークルームID: <span id="chatRoomId" class="loading">読み込み中...</span></p>
         </div>
-
-        <form id="orderForm">
-            <div class="form-group">
-                <label for="companyName" class="required">会社名</label>
-                <input type="text" id="companyName" required>
-            </div>
-            <div class="form-group">
-                <label for="fullName" class="required">氏名</label>
-                <input type="text" id="fullName" required>
-            </div>
-            <div class="form-group">
-                <label for="email" class="required">メールアドレス</label>
-                <input type="email" id="email" required>
-            </div>
-            <div class="form-group">
-                <label for="phoneNumber" class="required">電話番号</label>
-                <input type="tel" id="phoneNumber" pattern="[0-9\-]+" title="半角数字とハイフンのみ" required>
-            </div>
-            <div class="form-group">
-                <label for="orderContent" class="required">注文内容</label>
-                <textarea id="orderContent" required></textarea>
-            </div>
-            <div class="form-group">
-                <label for="notes">特記事項 (任意)</label>
-                <textarea id="notes"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="deliveryDate" class="required">配送日</label>
-                <input type="date" id="deliveryDate" required>
-            </div>
-            <div class="form-group">
-                <label for="scaffoldDate">足場組立日 (任意)</label>
-                <input type="date" id="scaffoldDate">
-            </div>
-            <div class="form-group">
-                <label for="jotoDate" class="required">上棟日</label>
-                <input type="date" id="jotoDate" required>
-            </div>
-
-            <div class="form-group file-upload-group">
-                <label>添付ファイル (任意, 最大3つまで)</label>
-                <input type="file" id="fileInput" accept="image/*, .pdf" multiple>
-                <div id="fileList" class="file-list"></div>
-            </div>
-            
-            <button type="submit" id="submitOrder">注文する</button>
-            <p id="statusMessage"></p>
-        </form>
+        
+        <button id="submitData">スプレッドシートに記録する</button>
+        <p id="statusMessage"></p>
     </div>
 
     <script>
         // ★重要: ここにLINE Developersで取得したあなたのLIFF IDを設定してください★
-        // 例: const liffId = '2000000000-XXXXXXXX';
         const liffId = '2007576580-4q0azmME'; 
 
         // ★重要: ここにGASでデプロイしたウェブアプリのURLを設定してください★
-        // 例: const gasWebhookUrl = 'https://script.google.com/macros/s/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/exec';
-        const gasWebhookUrl = 'https://script.google.com/macros/s/AKfycbwtExg4OHPtdrkr5hab8XaAP4vTnMTed5PeSusnw8PSJvXPWoiOYkzlR9Xbe30SiJoa/exec'; 
+        const gasWebhookUrl = 'https://script.google.com/macros/s/AKfycbxOFXwA5whfR7qYhxnEzkmr4zR7CfyrcBqxm6L-ucu_1TlvCWV41hTyFyuCi7z4zp-7/exec'; 
 
         const statusMessage = document.getElementById('statusMessage');
-        const fileInput = document.getElementById('fileInput');
-        const fileListDiv = document.getElementById('fileList');
-        const uploadedFiles = []; // ファイルデータをBase64で保持する配列
-
-        // ファイル選択時の処理
-        fileInput.addEventListener('change', (event) => {
-            const files = event.target.files;
-            if (uploadedFiles.length + files.length > 3) {
-                alert('添付できるファイルは最大3つまでです。');
-                return;
-            }
-
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        // Base64エンコードされたデータとファイル情報を保存
-                        uploadedFiles.push({
-                            name: file.name,
-                            type: file.type,
-                            data: e.target.result // Base64データ
-                        });
-                        renderFileList();
-                    };
-                    reader.readAsDataURL(file); // ファイルをBase64に変換
-                }
-            }
-            fileInput.value = ''; // ファイル選択をリセット
-        });
-
-        // ファイルリストの表示を更新
-        function renderFileList() {
-            fileListDiv.innerHTML = '';
-            uploadedFiles.forEach((file, index) => {
-                const fileItem = document.createElement('div');
-                fileItem.classList.add('file-item');
-                fileItem.innerHTML = `
-                    <span>${file.name} (${(file.data.length / 1024 / 1024).toFixed(2)} MB)</span>
-                    <button type="button" data-index="${index}">削除</button>
-                `;
-                fileItem.querySelector('button').addEventListener('click', (e) => {
-                    const idxToRemove = parseInt(e.target.dataset.index);
-                    uploadedFiles.splice(idxToRemove, 1);
-                    renderFileList();
-                });
-                fileListDiv.appendChild(fileItem);
-            });
-        }
-
+        let currentUserName = '未取得';
+        let currentChatRoomId = '未取得';
 
         // LIFF初期化処理
         if (typeof liff === 'undefined') {
@@ -263,7 +107,9 @@
 
                 if (liff.isLoggedIn()) {
                     liff.getProfile().then(profile => {
-                        document.getElementById('userName').innerText = profile.displayName;
+                        currentUserName = profile.displayName;
+                        document.getElementById('userName').innerText = currentUserName;
+                        console.log('User Profile:', profile);
                     }).catch(err => {
                         console.error("Error getting profile: ", err);
                         document.getElementById('userName').innerText = 'ユーザー名取得エラー';
@@ -272,9 +118,11 @@
                     const context = liff.getContext();
                     if (context) {
                         if (context.type === 'chat' || context.type === 'room') {
-                            document.getElementById('chatRoomId').innerText = context.chatId;
+                            currentChatRoomId = context.chatId;
+                            document.getElementById('chatRoomId').innerText = currentChatRoomId;
                         } else {
-                            document.getElementById('chatRoomId').innerText = `（チャット/グループ以外から開かれました: ${context.type}）`;
+                            currentChatRoomId = `（チャット/グループ以外から開かれました: ${context.type}）`;
+                            document.getElementById('chatRoomId').innerText = currentChatRoomId;
                         }
                     } else {
                         document.getElementById('chatRoomId').innerText = '（LIFFコンテキストが取得できません）';
@@ -290,10 +138,8 @@
             });
         }
 
-        // フォーム送信処理
-        document.getElementById('orderForm').addEventListener('submit', async (e) => {
-            e.preventDefault(); // デフォルトのフォーム送信を防止
-
+        // データ送信処理
+        document.getElementById('submitData').addEventListener('click', async () => {
             statusMessage.innerText = '';
             statusMessage.classList.remove('error');
 
@@ -303,60 +149,21 @@
                 liff.login();
                 return;
             }
-
-            const formData = {
-                companyName: document.getElementById('companyName').value,
-                fullName: document.getElementById('fullName').value,
-                email: document.getElementById('email').value,
-                phoneNumber: document.getElementById('phoneNumber').value,
-                orderContent: document.getElementById('orderContent').value,
-                notes: document.getElementById('notes').value,
-                deliveryDate: document.getElementById('deliveryDate').value,
-                scaffoldDate: document.getElementById('scaffoldDate').value,
-                jotoDate: document.getElementById('jotoDate').value
-            };
-
-            // 必須項目チェック
-            const requiredFields = {
-                companyName: '会社名',
-                fullName: '氏名',
-                email: 'メールアドレス',
-                phoneNumber: '電話番号',
-                orderContent: '注文内容',
-                deliveryDate: '配送日',
-                jotoDate: '上棟日'
-            };
-
-            for (const key in requiredFields) {
-                if (!formData[key]) {
-                    statusMessage.innerText = `${requiredFields[key]}は必須項目です。`;
-                    statusMessage.classList.add('error');
-                    return;
-                }
+            
+            if (currentUserName === '未取得' || currentChatRoomId === '未取得') {
+                statusMessage.innerText = 'ユーザー情報がまだ取得できていません。少し待ってから再度お試しください。';
+                statusMessage.classList.add('error');
+                return;
             }
 
-            statusMessage.innerText = 'ご注文を送信中...';
+            statusMessage.innerText = 'データを送信中...';
             statusMessage.style.color = 'orange';
-            document.getElementById('submitOrder').disabled = true; // 送信ボタンを無効化
+            document.getElementById('submitData').disabled = true; // 送信ボタンを無効化
 
             try {
-                const profile = await liff.getProfile();
-                const userId = profile.userId;
-                const idToken = liff.getIDToken();
-
-                if (!idToken) {
-                    statusMessage.innerText = 'LIFF IDトークンが取得できませんでした。';
-                    statusMessage.classList.add('error');
-                    document.getElementById('submitOrder').disabled = false;
-                    return;
-                }
-                
-                // GASへの送信データ
                 const postData = {
-                    userId: userId,
-                    idToken: idToken,
-                    formData: formData,
-                    files: uploadedFiles 
+                    userName: currentUserName,
+                    chatRoomId: currentChatRoomId
                 };
 
                 console.log("Sending data to GAS:", postData); // 送信データをコンソールにログ出力
@@ -371,48 +178,37 @@
                 
                 // レスポンスのHTTPステータスコードをチェック
                 if (!response.ok) {
-                    let errorDetails = `HTTPステータス: ${response.status}`;
-                    try {
-                        const errorJson = await response.json();
-                        errorDetails += `\nGASからのメッセージ: ${errorJson.message || JSON.stringify(errorJson)}`;
-                    } catch {
-                        const errorText = await response.text();
-                        errorDetails += `\nGASからの応答: ${errorText.substring(0, 100)}...`; // 長すぎる場合は切り詰める
-                    }
-                    console.error('HTTP Error Details:', errorDetails);
-                    throw new Error(`GASからのエラー: ${errorDetails}`);
+                    const errorText = await response.text(); // テキストとしてエラー内容を取得
+                    console.error('HTTP Error Status:', response.status);
+                    console.error('HTTP Error Text:', errorText);
+                    throw new Error(`GASからのHTTPエラー: ${response.status} - ${errorText}`);
                 }
 
                 const result = await response.json(); // JSONとして解析
 
                 if (result.success) {
-                    statusMessage.innerText = 'ご注文が送信されました！LINEに確認メッセージが送られました。';
+                    statusMessage.innerText = 'データがスプレッドシートに正常に記録されました！';
                     statusMessage.style.color = 'green';
                     setTimeout(() => {
                         liff.closeWindow(); // 成功後、LIFFアプリを閉じる
                     }, 2000); // 2秒後に閉じる
                 } else {
                     // GASから返されたエラーメッセージを表示
-                    statusMessage.innerText = `ご注文送信に失敗しました: ${result.message || '不明なエラー'}`;
+                    statusMessage.innerText = `データ記録に失敗しました: ${result.message || '不明なエラー'}`;
                     statusMessage.classList.add('error');
-                    console.error('Failed to submit order (GAS response):', result.error);
+                    console.error('Failed to record data (GAS response):', result.error);
                 }
             } catch (error) {
                 // 'Failed to fetch' やその他のネットワークエラーをここで捕捉
-                statusMessage.innerText = `注文送信中にエラーが発生しました: ${error.message}`;
+                statusMessage.innerText = `データ送信中にエラーが発生しました: ${error.message}`;
                 statusMessage.classList.add('error');
-                console.error('Error submitting order:', error);
-                
+                console.error('Error submitting data:', error);
                 // ネットワークエラーの場合、URLが間違っていないか、CORS設定は正しいか確認を促す
                 if (error.message.includes('Failed to fetch')) {
-                    statusMessage.innerText += '\n\n【重要な確認事項】\n' +
-                                             '1. index.htmlのGASのURLが最新かつ正しいか？\n' +
-                                             '2. GASのデプロイが最新で「アクセスできるユーザー：全員」か？\n' +
-                                             '3. GASのCORSヘッダー（Access-Control-Allow-Origin: *）が正しく設定されているか？\n' +
-                                             '4. PC版LINEのF12開発者ツールの「Network」タブを確認し、\n   GASへのリクエストのStatusとResponseを確認してください。';
+                    statusMessage.innerText += '\n(ヒント: GASのURLが正しいか、GASのデプロイとCORS設定を確認してください)';
                 }
             } finally {
-                document.getElementById('submitOrder').disabled = false; // 送信ボタンを再度有効化
+                document.getElementById('submitData').disabled = false; // 送信ボタンを再度有効化
             }
         });
     </script>
