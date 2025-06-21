@@ -38,7 +38,7 @@
             margin: 10px 0;
             font-size: 1.1em;
         }
-        #userIdDisplay, #userNameDisplay, #chatRoomIdDisplay { /* ID名を変更 */
+        #userIdDisplay, #userNameDisplay, #chatRoomIdDisplay { 
             font-weight: bold;
             color: #007bff;
         }
@@ -85,15 +85,49 @@
 
     <script>
         // ★重要: ここにLINE Developersで取得したあなたのLIFF IDを設定してください★
-        const liffId = '2007576580-4q0azmME'; 
+        const liffId = '2007576580-4q0azmME'; // 例: '2007576580-4q0azmME'; 
 
         // ★重要: ここにGASでデプロイしたウェブアプリのURLを設定してください★
-        const gasWebhookUrl = 'https://script.google.com/macros/s/AKfycbxR76bPIJfXQppnhqAVBWYPZFU_uvnUdQ917O53a3_ASCcvoFSH8HtnXYgXFyykLaJa/exec'; 
+        const gasWebhookUrl = 'https://script.google.com/macros/s/AKfycbytrnkr4l95vvZv5_kXLmw8I05Uv_YusAL5MffkZplVEdETQ3x39vpfmwmOkJPxAjkC/exec'; // 例: 'https://script.google.com/macros/s/AKfycbxR76bPIJfXQppnhqAVBWYPZFU_uvnUdQ917O53a3_ASCcvoFSH8HtnXYgXFyykLaJa/exec';
 
         const statusMessage = document.getElementById('statusMessage');
-        let currentUserId = '未取得'; // UserIDを格納する変数
+        let currentUserId = '未取得'; 
         let currentUserName = '未取得';
         let currentChatRoomId = '未取得';
+
+        // アクセス通知を一度だけ送信するためのフラグ
+        let accessNotified = false; 
+
+        // GASへのPOSTリクエスト送信ヘルパー関数
+        async function sendToGas(action, data) {
+            try {
+                const postData = { action: action, ...data }; // actionフィールドを追加
+                console.log(`Sending ${action} data to GAS:`, postData);
+
+                const response = await fetch(gasWebhookUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(postData)
+                });
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('HTTP Error Status:', response.status);
+                    console.error('HTTP Error Text:', errorText);
+                    throw new Error(`GASからのHTTPエラー: ${response.status} - ${errorText}`);
+                }
+
+                const result = await response.json();
+                console.log(`GAS response for ${action}:`, result);
+                return result;
+
+            } catch (error) {
+                console.error(`Error in sendToGas (${action}):`, error);
+                // エラーメッセージをHTML表示するため、ここでthrowする
+                throw error; 
+            }
+        }
+
 
         // LIFF初期化処理
         if (typeof liff === 'undefined') {
@@ -103,41 +137,52 @@
             document.getElementById('chatRoomIdDisplay').innerText = 'コンソールを確認してください。';
         } else {
             liff.init({ liffId: liffId })
-            .then(() => {
+            .then(async () => { // asyncを追加
                 console.log("LIFF initialization successful!");
                 document.getElementById('userIdDisplay').classList.remove('loading');
                 document.getElementById('userNameDisplay').classList.remove('loading');
                 document.getElementById('chatRoomIdDisplay').classList.remove('loading');
 
                 if (liff.isLoggedIn()) {
-                    liff.getProfile().then(profile => {
-                        currentUserId = profile.userId; // UserIDを取得
-                        currentUserName = profile.displayName;
-                        document.getElementById('userIdDisplay').innerText = currentUserId;
-                        document.getElementById('userNameDisplay').innerText = currentUserName;
-                        console.log('User Profile:', profile);
-                    }).catch(err => {
-                        console.error("Error getting profile: ", err);
-                        document.getElementById('userIdDisplay').innerText = '取得エラー';
-                        document.getElementById('userNameDisplay').innerText = '取得エラー';
-                    });
+                    const profile = await liff.getProfile(); // awaitを追加
+                    currentUserId = profile.userId; 
+                    currentUserName = profile.displayName;
+                    document.getElementById('userIdDisplay').innerText = currentUserId;
+                    document.getElementById('userNameDisplay').innerText = currentUserName;
+                    console.log('User Profile:', profile);
 
                     const context = liff.getContext();
                     if (context) {
                         if (context.type === 'chat' || context.type === 'room') {
                             currentChatRoomId = context.chatId;
-                            document.getElementById('chatRoomIdDisplay').innerText = currentChatRoomId;
-                            console.log('Chat Room ID:', currentChatRoomId);
                         } else {
                             currentChatRoomId = `（${context.type}から開かれました）`;
-                            document.getElementById('chatRoomIdDisplay').innerText = currentChatRoomId;
-                            console.log('Context Type (no Chat ID):', context.type);
                         }
+                        document.getElementById('chatRoomIdDisplay').innerText = currentChatRoomId;
+                        console.log('LIFF Context:', context);
                     } else {
                         currentChatRoomId = '（LIFFコンテキストが取得できません）';
                         document.getElementById('chatRoomIdDisplay').innerText = currentChatRoomId;
                         console.warn('LIFF context is null.');
                     }
+
+                    // ★LIFFにログインし、ユーザーIDが取得できたらアクセス通知を送信★
+                    if (!accessNotified && currentUserId !== '未取得') {
+                        try {
+                            const result = await sendToGas('notify_access', { userId: currentUserId });
+                            if (result.success) {
+                                console.log('Access notification sent successfully.');
+                                accessNotified = true; // 送信済みフラグを立てる
+                            } else {
+                                console.error('Failed to send access notification:', result.message);
+                                // HTML上にエラーを表示しないが、コンソールにはログを残す
+                            }
+                        } catch (notifyError) {
+                            console.error('Error sending access notification:', notifyError);
+                            // HTML上にエラーを表示しないが、コンソールにはログを残す
+                        }
+                    }
+
                 } else {
                     liff.login(); 
                 }
@@ -150,7 +195,7 @@
             });
         }
 
-        // データ送信処理
+        // スプレッドシート記録ボタンの処理
         document.getElementById('submitData').addEventListener('click', async () => {
             statusMessage.innerText = '';
             statusMessage.classList.remove('error');
@@ -173,37 +218,17 @@
             document.getElementById('submitData').disabled = true; // 送信ボタンを無効化
 
             try {
-                const postData = {
-                    userId: currentUserId, // UserIDを送信
+                const result = await sendToGas('record_data', {
+                    userId: currentUserId,
                     userName: currentUserName,
                     chatRoomId: currentChatRoomId
-                };
-
-                console.log("Sending data to GAS:", postData);
-
-                const response = await fetch(gasWebhookUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(postData)
                 });
-                
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error('HTTP Error Status:', response.status);
-                    console.error('HTTP Error Text:', errorText);
-                    throw new Error(`GASからのHTTPエラー: ${response.status} - ${errorText}`);
-                }
-
-                const result = await response.json();
 
                 if (result.success) {
                     statusMessage.innerText = 'データがスプレッドシートに正常に記録されました！';
                     statusMessage.style.color = 'green';
-                    setTimeout(() => {
-                        liff.closeWindow(); 
-                    }, 2000); 
+                    // スプレッドシート記録成功後にLIFFアプリを閉じる（任意）
+                    // setTimeout(() => { liff.closeWindow(); }, 2000); 
                 } else {
                     statusMessage.innerText = `データ記録に失敗しました: ${result.message || '不明なエラー'}`;
                     statusMessage.classList.add('error');
