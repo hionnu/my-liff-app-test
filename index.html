@@ -1,180 +1,301 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>注文フォーム</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>スタイリッシュ注文フォーム</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body {
-            font-family: sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f0f2f5;
-            color: #333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+        /* カスタムカラー設定 for Tailwind JIT */
+        /* 画像の明るい雰囲気とコーポレートカラーを基に再定義 */
+        :root {
+            /* ベースカラー (明るいトーン) */
+            --color-primary-bg: #F8F9FA;   /* 非常に明るい背景色 (ほぼ白) */
+            --color-card-bg: #FFFFFF;     /* カードの背景色 (純白) */
+            --color-text-dark: #212529;    /* 主要なテキスト色 (濃いグレー) */
+            --color-text-muted: #6C757D;   /* 控えめなテキスト色 (中間グレー) */
+            --color-border-subtle: #DEE2E6; /* 微妙なボーダー色 */
+
+            /* コーポレートカラー (明るく、活気のあるトーン) */
+            --color-corporate-green: #28A745; /* 強めの緑 */
+            --color-corporate-green-light: #E9F8EE; /* 非常に明るい緑 (背景用) */
+            --color-corporate-blue: #007BFF;  /* 強めの青 */
+            --color-corporate-blue-light: #E0EFFE; /* 非常に明るい青 (背景用) */
+
+            /* ボタンやアクセント用のシャドウ */
+            --shadow-md-custom: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg-custom: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
-        .container {
-            background-color: white;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            max-width: 600px;
-            margin: 20px auto;
-        }
-        h1, h2 {
-            text-align: center;
-            color: #333;
-        }
-        .info-section {
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #eee;
-            text-align: center;
-        }
-        .info-section p {
-            margin: 5px 0;
-            font-size: 0.95em;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        .form-group input[type="text"],
-        .form-group input[type="email"],
-        .form-group input[type="tel"],
-        .form-group input[type="number"],
-        .form-group input[type="date"],
-        .form-group textarea,
-        .form-group select {
-            width: calc(100% - 22px);
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 1em;
-            box-sizing: border-box; /* パディングを含めて幅を計算 */
-        }
-        .form-group textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-        .form-group .required::after {
-            content: " *";
-            color: red;
+        .bg-primary-bg { background-color: var(--color-primary-bg); }
+        .bg-card-bg { background-color: var(--color-card-bg); }
+        .text-text-dark { color: var(--color-text-dark); }
+        .text-text-muted { color: var(--color-text-muted); }
+        .border-border-subtle { border-color: var(--color-border-subtle); }
+        
+        .bg-corporate-green { background-color: var(--color-corporate-green); }
+        .bg-corporate-green-light { background-color: var(--color-corporate-green-light); }
+        .text-corporate-green { color: var(--color-corporate-green); }
+        .bg-corporate-blue { background-color: var(--color-corporate-blue); }
+        .bg-corporate-blue-light { background-color: var(--color-corporate-blue-light); }
+        .text-corporate-blue { color: var(--color-corporate-blue); }
+
+        /* フォーカスリングの色をコーポレートブルーに */
+        .focus-ring-corporate-blue:focus { 
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.4); /* RGBA for transparency */
+            border-color: var(--color-corporate-blue); 
         }
 
-        button#submitOrder {
-            background-color: #007bff;
-            color: white;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1.1em;
-            margin-top: 30px;
-            width: 100%;
+        /* カスタムシャドウ */
+        .shadow-md-custom { box-shadow: var(--shadow-md-custom); }
+        .shadow-lg-custom { box-shadow: var(--shadow-lg-custom); }
+
+        /* Inter フォントの読み込み */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
         }
-        button#submitOrder:hover {
-            background-color: #0056b3;
-        }
-        #statusMessage {
-            margin-top: 20px;
-            font-weight: bold;
-            text-align: center;
-            color: green;
-        }
-        .error {
-            color: red;
-        }
-        #versionInfo { 
-            margin-top: 20px;
-            font-size: 0.8em;
-            color: #777;
-        }
+
+        /* Bootstrap Icons CDN */
+        @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css");
     </style>
+    <!-- LIFF SDK -->
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 </head>
-<body>
-    <div class="container">
-        <h1>注文受付フォーム</h1>
-        <div class="info-section">
-            <p>ユーザーID: <span id="userIdDisplay" class="loading">読み込み中...</span></p>
-            <p>ユーザー名: <span id="userNameDisplay" class="loading">読み込み中...</span></p>
-            <p>トークルームID: <span id="chatRoomIdDisplay" class="loading">読み込み中...</span></p>
+<body class="bg-primary-bg min-h-screen flex items-center justify-center p-4">
+    <div class="bg-card-bg rounded-3xl shadow-lg-custom p-6 md:p-10 w-full max-w-3xl">
+        <h1 class="text-3xl md:text-4xl font-bold text-text-dark text-center mb-10">
+            <i class="bi bi-box-seam inline-block align-middle text-corporate-green mr-3"></i> 注文受付フォーム
+        </h1>
+
+        <!-- ユーザー情報セクション -->
+        <div class="bg-corporate-blue-light rounded-xl p-5 mb-8 shadow-md-custom text-base md:text-lg border border-corporate-blue">
+            <p class="text-text-dark mb-2 flex items-center">
+                <i class="bi bi-person-fill text-corporate-blue mr-3 text-xl"></i>
+                <span class="font-semibold">ユーザーID:</span> <span id="userIdDisplay" class="ml-2 font-medium text-text-muted">読み込み中...</span>
+            </p>
+            <p class="text-text-dark mb-2 flex items-center">
+                <i class="bi bi-file-person-fill text-corporate-blue mr-3 text-xl"></i>
+                <span class="font-semibold">ユーザー名:</span> <span id="userNameDisplay" class="ml-2 font-medium text-text-muted">読み込み中...</span>
+            </p>
         </div>
 
-        <form id="orderForm">
-            <div class="form-group">
-                <label for="companyName" class="required">会社名</label>
-                <input type="text" id="companyName" required>
+        <!-- 注文フォーム -->
+        <form id="orderForm" class="space-y-6">
+            <!-- 会社名・氏名 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="form-group">
+                    <label for="companyName" class="block text-text-dark text-sm font-semibold mb-2 required">
+                        <i class="bi bi-building text-corporate-green mr-2"></i> 会社名
+                    </label>
+                    <input type="text" id="companyName" required
+                           class="w-full p-3.5 rounded-lg bg-gray-50 border border-border-subtle text-text-dark placeholder-text-muted
+                                  focus:outline-none focus:ring-2 focus:ring-corporate-blue focus-ring-corporate-blue text-base">
+                </div>
+                <div class="form-group">
+                    <label for="fullName" class="block text-text-dark text-sm font-semibold mb-2 required">
+                        <i class="bi bi-person-badge text-corporate-green mr-2"></i> 氏名
+                    </label>
+                    <input type="text" id="fullName" required
+                           class="w-full p-3.5 rounded-lg bg-gray-50 border border-border-subtle text-text-dark placeholder-text-muted
+                                  focus:outline-none focus:ring-2 focus:ring-corporate-blue focus-ring-corporate-blue text-base">
+                </div>
             </div>
-            <div class="form-group">
-                <label for="fullName" class="required">氏名</label>
-                <input type="text" id="fullName" required>
+
+            <!-- メールアドレス・電話番号 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="form-group">
+                    <label for="email" class="block text-text-dark text-sm font-semibold mb-2 required">
+                        <i class="bi bi-envelope-fill text-corporate-green mr-2"></i> メールアドレス
+                    </label>
+                    <input type="email" id="email" required
+                           class="w-full p-3.5 rounded-lg bg-gray-50 border border-border-subtle text-text-dark placeholder-text-muted
+                                 focus:outline-none focus:ring-2 focus:ring-corporate-blue focus-ring-corporate-blue text-base">
+                </div>
+                <div class="form-group">
+                    <label for="phoneNumber" class="block text-text-dark text-sm font-semibold mb-2 required">
+                        <i class="bi bi-phone-fill text-corporate-green mr-2"></i> 電話番号
+                    </label>
+                    <input type="tel" id="phoneNumber" pattern="[0-9\-]+" title="半角数字とハイフンのみ" required
+                           class="w-full p-3.5 rounded-lg bg-gray-50 border border-border-subtle text-text-dark placeholder-text-muted
+                                 focus:outline-none focus:ring-2 focus:ring-corporate-blue focus-ring-corporate-blue text-base">
+                </div>
             </div>
+
+            <!-- 注文内容 -->
             <div class="form-group">
-                <label for="email" class="required">メールアドレス</label>
-                <input type="email" id="email" required>
+                <label for="orderContent" class="block text-text-dark text-sm font-semibold mb-2 required">
+                    <i class="bi bi-card-text text-corporate-green mr-2"></i> 注文内容
+                </label>
+                <textarea id="orderContent" required rows="4"
+                          class="w-full p-3.5 rounded-lg bg-gray-50 border border-border-subtle text-text-dark resize-y placeholder-text-muted
+                                 focus:outline-none focus:ring-2 focus:ring-corporate-blue focus-ring-corporate-blue text-base"></textarea>
             </div>
+
+            <!-- 特記事項 -->
             <div class="form-group">
-                <label for="phoneNumber" class="required">電話番号</label>
-                <input type="tel" id="phoneNumber" pattern="[0-9\-]+" title="半角数字とハイフンのみ" required>
+                <label for="notes" class="block text-text-dark text-sm font-semibold mb-2">
+                    <i class="bi bi-journal-text text-corporate-green mr-2"></i> 特記事項 (任意)
+                </label>
+                <textarea id="notes" rows="2"
+                          class="w-full p-3.5 rounded-lg bg-gray-50 border border-border-subtle text-text-dark resize-y placeholder-text-muted
+                                 focus:outline-none focus:ring-2 focus:ring-corporate-blue focus-ring-corporate-blue text-base"></textarea>
             </div>
-            <div class="form-group">
-                <label for="orderContent" class="required">注文内容</label>
-                <textarea id="orderContent" required></textarea>
-            </div>
-            <div class="form-group">
-                <label for="notes">特記事項 (任意)</label>
-                <textarea id="notes"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="deliveryDate" class="required">配送日</label>
-                <input type="date" id="deliveryDate" required>
-            </div>
-            <div class="form-group">
-                <label for="scaffoldDate">足場組立日 (任意)</label>
-                <input type="date" id="scaffoldDate">
-            </div>
-            <div class="form-group">
-                <label for="jotoDate" class="required">上棟日</label>
-                <input type="date" id="jotoDate">
+
+            <!-- 日付関連 -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="form-group">
+                    <label for="deliveryDate" class="block text-text-dark text-sm font-semibold mb-2 required">
+                        <i class="bi bi-calendar-check text-corporate-green mr-2"></i> 配送日
+                    </label>
+                    <input type="date" id="deliveryDate" required
+                           class="w-full p-3.5 rounded-lg bg-gray-50 border border-border-subtle text-text-dark
+                                  focus:outline-none focus:ring-2 focus:ring-corporate-blue focus-ring-corporate-blue text-base">
+                </div>
+                <div class="form-group">
+                    <label for="scaffoldDate" class="block text-text-dark text-sm font-semibold mb-2">
+                        <i class="bi bi-hammer text-corporate-green mr-2"></i> 足場組立日 (任意)
+                    </label>
+                    <input type="date" id="scaffoldDate"
+                           class="w-full p-3.5 rounded-lg bg-gray-50 border border-border-subtle text-text-dark
+                                  focus:outline-none focus:ring-2 focus:ring-corporate-blue focus-ring-corporate-blue text-base">
+                </div>
+                <div class="form-group">
+                    <label for="jotoDate" class="block text-text-dark text-sm font-semibold mb-2">
+                        <i class="bi bi-house-door-fill text-corporate-green mr-2"></i> 上棟日 (任意)
+                    </label>
+                    <input type="date" id="jotoDate"
+                           class="w-full p-3.5 rounded-lg bg-gray-50 border border-border-subtle text-text-dark
+                                  focus:outline-none focus:ring-2 focus:ring-corporate-blue focus-ring-corporate-blue text-base">
+                </div>
             </div>
             
-            <button type="submit" id="submitOrder">注文する</button>
-            <p id="statusMessage"></p>
+            <!-- New File Upload Section -->
+            <div class="form-group bg-corporate-green-light p-6 rounded-xl shadow-md-custom border border-corporate-green">
+                <label class="block text-text-dark text-lg font-semibold mb-3">
+                    <i class="bi bi-paperclip text-corporate-green mr-2"></i> 添付ファイル (任意, 最大3つまで)
+                </label>
+                <input type="file" id="fileInput" accept="image/*, .pdf" multiple
+                       class="w-full text-text-dark text-sm file:mr-4 file:py-2 file:px-4
+                              file:rounded-full file:border-0 file:text-sm file:font-semibold
+                              file:bg-corporate-blue file:text-white hover:file:bg-blue-700 cursor-pointer">
+                <div id="fileList" class="mt-4 space-y-2 text-text-muted text-sm">
+                    <!-- 選択されたファイルが表示される -->
+                </div>
+            </div>
+
+            <button type="submit" id="submitOrder"
+                    class="bg-corporate-green text-white p-4 rounded-xl font-bold text-xl w-full
+                           hover:bg-green-700 transition duration-300 ease-in-out shadow-lg-custom
+                           flex items-center justify-center">
+                <i class="bi bi-send-fill mr-3"></i> 注文を送信する
+            </button>
+            <p id="statusMessage" class="mt-4 text-center text-base font-medium text-text-dark"></p>
         </form>
-        <p id="versionInfo"></p>
+        <p id="versionInfo" class="mt-8 text-text-muted text-xs text-center"></p>
     </div>
 
     <script>
         // ★重要: ここにLINE Developersで取得したあなたのLIFF IDを設定してください★
-        const liffId = '2007576580-4q0azmME'; 
+        const liffId = 'YOUR_LIFF_ID'; 
 
         // ★重要: ここにGoogle Cloud Functionsでデプロイした関数のURLを設定してください★
         const cloudFunctionUrl = 'https://handle-liff-order-request-261123846998.asia-northeast1.run.app'; 
 
+        const userIdDisplay = document.getElementById('userIdDisplay');
+        const userNameDisplay = document.getElementById('userNameDisplay');
+        const chatRoomIdDisplay = document.getElementById('chatRoomIdDisplay');
         const statusMessage = document.getElementById('statusMessage');
         const versionInfoElement = document.getElementById('versionInfo'); 
+        const submitOrderButton = document.getElementById('submitOrder');
+        const fileInput = document.getElementById('fileInput');
+        const fileListDiv = document.getElementById('fileList');
+
         let currentUserId = '未取得'; 
         let currentUserName = '未取得';
         let currentChatRoomId = '未取得';
-
         let accessNotified = false; 
+        const uploadedFiles = []; // ファイルデータをBase64で保持する配列
 
         // バージョン情報を表示
         const now = new Date();
         const versionString = `Ver. ${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}-${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}${now.getSeconds().toString().padStart(2, '0')}`;
         versionInfoElement.innerText = versionString;
 
+        // --- ファイルアップロード関連のJSロジック ---
+        fileInput.addEventListener('change', (event) => {
+            const files = event.target.files;
+            if (uploadedFiles.length + files.length > 3) {
+                statusMessage.innerText = '添付できるファイルは最大3つまでです。';
+                statusMessage.classList.add('error', 'text-red-500');
+                return;
+            }
 
-        // Cloud FunctionsへのPOSTリクエスト送信ヘルパー関数
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                if (file) {
+                    // ファイルサイズチェック (例: 10MBまで)
+                    if (file.size > 10 * 1024 * 1024) {
+                        statusMessage.innerText = `ファイル「${file.name}」は10MBを超えています。`;
+                        statusMessage.classList.add('error', 'text-red-500');
+                        continue; // 次のファイルへ
+                    }
+
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        uploadedFiles.push({
+                            name: file.name,
+                            type: file.type,
+                            data: e.target.result // Base64データ
+                        });
+                        renderFileList();
+                        statusMessage.innerText = ''; // エラーメッセージをクリア
+                        statusMessage.classList.remove('error', 'text-red-500');
+                    };
+                    reader.onerror = (e) => {
+                        statusMessage.innerText = `ファイル「${file.name}」の読み込み中にエラーが発生しました。`;
+                        statusMessage.classList.add('error', 'text-red-500');
+                        console.error('FileReader error:', e);
+                    };
+                    reader.readAsDataURL(file); // ファイルをBase64に変換
+                }
+            }
+            fileInput.value = ''; // ファイル選択をリセット
+        });
+
+        // ファイルリストの表示を更新
+        function renderFileList() {
+            fileListDiv.innerHTML = '';
+            uploadedFiles.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.classList.add('flex', 'items-center', 'justify-between', 'bg-corporate-blue-light', 'p-2', 'rounded-lg', 'shadow-sm');
+                fileItem.innerHTML = `
+                    <span class="text-text-dark text-sm font-medium flex items-center">
+                        <i class="bi bi-file-earmark-fill text-corporate-blue mr-2"></i>
+                        ${file.name} (${(file.data.length / 1024 / 1024).toFixed(2)} MB)
+                    </span>
+                    <button type="button" data-index="${index}"
+                            class="bg-red-500 text-white rounded-full p-1 w-6 h-6 flex items-center justify-center text-xs font-bold
+                                   hover:bg-red-600 transition duration-150 ease-in-out">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                `;
+                fileItem.querySelector('button').addEventListener('click', (e) => {
+                    const idxToRemove = parseInt(e.currentTarget.dataset.index); // currentTargetを使用
+                    uploadedFiles.splice(idxToRemove, 1);
+                    renderFileList();
+                    statusMessage.innerText = 'ファイルが削除されました。';
+                    statusMessage.classList.add('text-text-muted');
+                });
+                fileListDiv.appendChild(fileItem);
+            });
+            if (uploadedFiles.length === 0) {
+                 fileListDiv.innerHTML = '<p class="text-text-muted">選択されたファイルはありません。</p>';
+            }
+        }
+        renderFileList(); // 初期表示
+
+        // --- Cloud FunctionsへのPOSTリクエスト送信ヘルパー関数 ---
         async function sendToCloudFunction(action, data) {
             try {
                 const postData = { action: action, ...data }; 
@@ -207,23 +328,23 @@
         // LIFF初期化処理
         if (typeof liff === 'undefined') {
             console.error("エラー: LIFF SDKが読み込まれていません。スクリプトタグを確認してください。");
-            document.getElementById('userIdDisplay').innerText = 'エラー: SDK読み込み失敗';
-            document.getElementById('userNameDisplay').innerText = 'エラー: SDK読み込み失敗';
-            document.getElementById('chatRoomIdDisplay').innerText = 'コンソールを確認してください。';
+            userIdDisplay.innerText = 'エラー: SDK読み込み失敗';
+            userNameDisplay.innerText = 'エラー: SDK読み込み失敗';
+            chatRoomIdDisplay.innerText = 'コンソールを確認してください。';
         } else {
             liff.init({ liffId: liffId })
             .then(async () => { 
                 console.log("LIFF initialization successful!");
-                document.getElementById('userIdDisplay').classList.remove('loading');
-                document.getElementById('userNameDisplay').classList.remove('loading');
-                document.getElementById('chatRoomIdDisplay').classList.remove('loading');
+                userIdDisplay.classList.remove('loading');
+                userNameDisplay.classList.remove('loading');
+                chatRoomIdDisplay.classList.remove('loading');
 
                 if (liff.isLoggedIn()) {
                     const profile = await liff.getProfile(); 
                     currentUserId = profile.userId; 
                     currentUserName = profile.displayName;
-                    document.getElementById('userIdDisplay').innerText = currentUserId;
-                    document.getElementById('userNameDisplay').innerText = currentUserName;
+                    userIdDisplay.innerText = currentUserId;
+                    userNameDisplay.innerText = currentUserName;
                     console.log('User Profile:', profile);
 
                     const context = liff.getContext();
@@ -233,11 +354,11 @@
                         } else {
                             currentChatRoomId = `（${context.type}から開かれました）`;
                         }
-                        document.getElementById('chatRoomIdDisplay').innerText = currentChatRoomId;
+                        chatRoomIdDisplay.innerText = currentChatRoomId;
                         console.log('LIFF Context:', context);
                     } else {
                         currentChatRoomId = '（LIFFコンテキストが取得できません）';
-                        document.getElementById('chatRoomIdDisplay').innerText = currentChatRoomId;
+                        chatRoomIdDisplay.innerText = currentChatRoomId;
                         console.warn('LIFF context is null.');
                     }
 
@@ -262,9 +383,9 @@
             })
             .catch((err) => {
                 console.error("LIFF初期化に失敗しました: ", err);
-                document.getElementById('userIdDisplay').innerText = '初期化エラー';
-                document.getElementById('userNameDisplay').innerText = '初期化エラー';
-                document.getElementById('chatRoomIdDisplay').innerText = '（詳細はコンソールを確認）';
+                userIdDisplay.innerText = '初期化エラー';
+                userNameDisplay.innerText = '初期化エラー';
+                chatRoomIdDisplay.innerText = '（詳細はコンソールを確認）';
             });
         }
 
@@ -273,18 +394,19 @@
             e.preventDefault(); // デフォルトのフォーム送信を防止
 
             statusMessage.innerText = '';
-            statusMessage.classList.remove('error');
+            statusMessage.classList.remove('error', 'text-red-500', 'text-corporate-green', 'text-corporate-blue'); 
+            statusMessage.classList.add('text-text-dark'); /* デフォルト色に戻す */
 
             if (!liff.isLoggedIn()) {
                 statusMessage.innerText = 'LIFFにログインしていません。ログイン後に再度お試しください。';
-                statusMessage.classList.add('error');
+                statusMessage.classList.add('error', 'text-red-500');
                 liff.login();
                 return;
             }
             
             if (currentUserId === '未取得' || currentUserName === '未取得' || currentChatRoomId === '未取得') {
                 statusMessage.innerText = 'ユーザー情報がまだ取得できていません。少し待ってから再度お試しください。';
-                statusMessage.classList.add('error');
+                statusMessage.classList.add('error', 'text-red-500');
                 return;
             }
 
@@ -308,49 +430,50 @@
                 phoneNumber: '電話番号',
                 orderContent: '注文内容',
                 deliveryDate: '配送日',
-                jotoDate: '上棟日'
+                // 上棟日も任意入力になったため、必須項目から除外
             };
 
             for (const key in requiredFields) {
                 if (!formData[key]) {
                     statusMessage.innerText = `${requiredFields[key]}は必須項目です。`;
-                    statusMessage.classList.add('error');
+                    statusMessage.classList.add('error', 'text-red-500');
                     return;
                 }
             }
 
             statusMessage.innerText = 'ご注文を送信中...';
-            statusMessage.style.color = 'orange';
-            document.getElementById('submitOrder').disabled = true; 
+            statusMessage.style.color = 'orange'; 
+            submitOrderButton.disabled = true; 
 
             try {
-                const result = await sendToCloudFunction('record_order', { // actionをrecord_orderに
+                const result = await sendToCloudFunction('record_order', { 
                     userId: currentUserId,
                     userName: currentUserName,
                     chatRoomId: currentChatRoomId,
-                    orderDetails: formData // フォームデータをorder_detailsとして送信
+                    orderDetails: formData,
+                    files: uploadedFiles // 添付ファイルデータを送信
                 });
 
                 if (result.success) {
                     statusMessage.innerText = 'ご注文が送信されました！LINEに確認メッセージが送られました。';
-                    statusMessage.style.color = 'green';
+                    statusMessage.classList.add('text-corporate-green'); 
                     setTimeout(() => {
                         liff.closeWindow(); 
                     }, 2000); 
                 } else {
                     statusMessage.innerText = `ご注文送信に失敗しました: ${result.message || '不明なエラー'}`;
-                    statusMessage.classList.add('error');
+                    statusMessage.classList.add('error', 'text-red-500');
                     console.error('Failed to submit order (Cloud Functions response):', result.error);
                 }
             } catch (error) {
                 statusMessage.innerText = `注文送信中にエラーが発生しました: ${error.message}`;
-                statusMessage.classList.add('error');
+                statusMessage.classList.add('error', 'text-red-500');
                 console.error('Error submitting order:', error);
                 if (error.message.includes('Failed to fetch')) {
                     statusMessage.innerText += '\n(ヒント: Cloud FunctionsのURLが正しいか、デプロイとCORS設定を確認してください)';
                 }
             } finally {
-                document.getElementById('submitOrder').disabled = false; 
+                submitOrderButton.disabled = false; 
             }
         });
     </script>
