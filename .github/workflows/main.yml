@@ -1,40 +1,31 @@
 name: Deploy to GitHub Pages
-
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
 
 permissions:
-  contents: read       # コードの読み取り
-  pages: write         # Pages への書き込み
-  id-token: write      # OIDC トークン取得（必要に応じて）
+  contents: read
+  pages: write
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
 
     steps:
-      # 1. リポジトリをチェックアウト
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v3
 
-      # 2. テンプレート HTML をコピー → プレースホルダ置換
-      - name: Generate HTML with secret
+      - name: Inject secret into HTML
         env:
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: |
-          cp html.template index.html
+          # index.html（プレースホルダ入り）をそのまま上書き
           sed -i "s/{{SECRET_KEY}}/${SECRET_KEY//\//\\/}/g" index.html
 
-      # 3. GitHub Pages 用アーティファクトをアップロード（v3）
-      - name: Upload artifact for GitHub Pages
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: index.html
 
-      # 4. GitHub Pages へデプロイ（v4）
-      - name: Deploy to GitHub Pages
+      - name: Deploy Pages
         uses: actions/deploy-pages@v4
