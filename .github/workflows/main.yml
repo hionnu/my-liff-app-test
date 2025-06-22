@@ -21,6 +21,12 @@ jobs:
       # Cloud Functions URLのプレースホルダーのみを置き換える
       - name: Replace Cloud Functions URL placeholder
         run: |
+          # ★デバッグ用: index.html の内容をログに出力します★
+          echo "--- index.html content before sed ---"
+          cat index.html
+          echo "-------------------------------------"
+          
+          # sedコマンドを実行
           sed -i "s|YOUR_CLOUD_FUNCTION_URL_PLACEHOLDER|${{ secrets.CLOUD_FUNCTION_URL }}|g" index.html
 
       - name: Deploy to GitHub Pages
