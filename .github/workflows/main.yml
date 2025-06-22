@@ -1,38 +1,39 @@
-name: Deploy to GitHub Pages
+ name: Deploy to GitHub Pages
+ on:
+   push:
+     branches: [ main ]
 
-on:
-  push:
-    branches: [ main ]
+-permissions:
+-  contents: read
+-  pages: write
++permissions:
++  contents: read     # コードの読み取り
++  pages: write       # Pages への書き込み
++  id-token: write    # OIDC トークン取得に必要
 
-permissions:
-  contents: read
-  pages: write
+ jobs:
+   build-and-deploy:
+     runs-on: ubuntu-latest
 
-jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
+     steps:
+       - name: Checkout repository
+         uses: actions/checkout@v3
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+       - name: Inject secret into HTML
+         env:
+           SECRET_KEY: ${{ secrets.SECRET_KEY }}
+         run: |
+           sed -i "s/{{SECRET_KEY}}/${SECRET_KEY//\//\\/}/g" index.html
 
-      - name: Inject secret into HTML
-        # index.html に {{SECRET_KEY}} プレースホルダを直接書いておき、
-        # ここで sed 置換して上書きします
-        env:
-          SECRET_KEY: ${{ secrets.SECRET_KEY }}
-        run: |
-          sed -i "s/{{SECRET_KEY}}/${SECRET_KEY//\//\\/}/g" index.html
+       - name: Prepare artifact directory
+         run: |
+           mkdir public
+           mv index.html public/index.html
 
-      - name: Prepare artifact directory
-        run: |
-          mkdir public
-          mv index.html public/index.html
+       - name: Upload artifact for GitHub Pages
+         uses: actions/upload-pages-artifact@v3
+         with:
+           path: public
 
-      - name: Upload artifact for GitHub Pages
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: public
-
-      - name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v4
+       - name: Deploy to GitHub Pages
+         uses: actions/deploy-pages@v4
