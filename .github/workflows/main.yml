@@ -1,0 +1,45 @@
+name: Fresh Start Secrets Replacement
+
+on:
+  push:
+    branches:
+      - main # あなたのデプロイ対象ブランチに合わせてください (例: master, gh-pages)
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Replace Secrets Placeholders
+        run: |
+          # ★デバッグ用: sed実行前のindex.htmlの内容を出力します★
+          echo "--- index.html content BEFORE sed ---"
+          cat index.html
+          echo "-------------------------------------"
+          
+          # LIFF IDのプレースホルダーをSecretsの値で置き換える
+          # パターンは_LIFF_ID_PLACEHOLDER_。手入力した文字列と完全に一致させること！
+          sed -i "s|_LIFF_ID_PLACEHOLDER_|${{ secrets.LIFF_ID }}|g" index.html
+          
+          # Cloud Functions URLのプレースホルダーをSecretsの値で置き換える
+          # パターンは_CLOUD_FUNCTION_URL_PLACEHOLDER_。手入力した文字列と完全に一致させること！
+          sed -i "s|_CLOUD_FUNCTION_URL_PLACEHOLDER_|${{ secrets.CLOUD_FUNCTION_URL }}|g" index.html
+          
+          # ★デバッグ用: sed実行後のindex.htmlの内容を出力します★
+          echo "--- index.html content AFTER sed ---"
+          cat index.html
+          echo "------------------------------------"
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./
