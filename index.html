@@ -9,13 +9,13 @@
     <h1>Sed Replacement Test</h1>
     <p>This is a direct text replacement test: <span id="directText">HelloSedTest!</span></p>
     <p>This is a GitHub Variable replacement test: <span id="variableText">testtesttest</span></p>
-    
+    <p>This is a GitHub Variable replacement test: <span id="variableText">YOUR_LIFF_ID_PLACEHOLDER</span></p>
     <script>
-        // デバッグ用: これらのプレースホルダーが置き換えられるか確認します
-        // const liffId = 'YOUR_LIFF_ID_PLACEHOLDER'; 
-        // const cloudFunctionUrl = 'YOUR_CLOUD_FUNCTION_URL_PLACEHOLDER'; 
-        
-        // 通常のHTML要素に直接書き出すことで、JavaScript側の影響を排除します
+        // LIFF IDのプレースホルダーを追加
+        const liffId = 'YOUR_LIFF_ID_PLACEHOLDER'; 
+
+        // LIFF IDをページに直接表示する（デバッグ用）
+        document.write('<p>LIFF ID: ' + liffId + '</p>');
     </script>
 </body>
 </html>
