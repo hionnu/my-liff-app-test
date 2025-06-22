@@ -1,4 +1,4 @@
-name: Fresh Start Secrets Replacement
+name: Test Variable Replacement
 
 on:
   push:
@@ -18,20 +18,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Replace Secrets Placeholders
+      - name: Replace Test Variable Placeholder
         run: |
           # ★デバッグ用: sed実行前のindex.htmlの内容を出力します★
           echo "--- index.html content BEFORE sed ---"
           cat index.html
           echo "-------------------------------------"
           
-          # LIFF IDのプレースホルダーをSecretsの値で置き換える
-          # パターンは_LIFF_ID_PLACEHOLDER_。手入力した文字列と完全に一致させること！
-          sed -i "s|_LIFF_ID_PLACEHOLDER_|${{ secrets.LIFF_ID }}|g" index.html
-          
-          # Cloud Functions URLのプレースホルダーをSecretsの値で置き換える
-          # パターンは_CLOUD_FUNCTION_URL_PLACEHOLDER_。手入力した文字列と完全に一致させること！
-          sed -i "s|_CLOUD_FUNCTION_URL_PLACEHOLDER_|${{ secrets.CLOUDFUNCTIONURL }}|g" index.html
+          # GitHub Variablesの値を置換
+          sed -i "s|YOUR_TEST_VARIABLE_PLACEHOLDER|${{ vars.TEST_VAR }}|g" index.html
           
           # ★デバッグ用: sed実行後のindex.htmlの内容を出力します★
           echo "--- index.html content AFTER sed ---"
