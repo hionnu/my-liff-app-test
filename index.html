@@ -3,27 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Replacement Test Page</title>
+    <title>Secrets Replacement Test</title>
 </head>
 <body>
-    <h1>Sed Replacement Test</h1>
-    <p>This is a direct text replacement test: <span id="directText">HelloSedTest!</span></p>
-    <p>This is a GitHub Variable replacement test: <span id="variableText">testtesttest</span></p>
-    <p>This is a GitHub secrets replacement test: <span id="secretsText">2007576580-4q0azmME</span></p>
+    <h1>Secrets Replacement Test Page</h1>
+    <p>This page tests if secrets are correctly replaced.</p>
+    
     <script>
-        // LIFF IDのプレースホルダーを追加
-        const testId = 'testtesttest'; 
+        // ★ここにLIFF IDのプレースホルダーを「手入力」してください★
+        // const liffId = '_LIFF_ID_PLACEHOLDER_'; 
+        // この行はデバッグ用。後で削除するかコメントアウトします
+        document.write('<p>LIFF ID from HTML: ' + '_LIFF_ID_PLACEHOLDER_' + '</p>');
 
-        // LIFF IDをページに直接表示する（デバッグ用）
-        document.write('<p>testId: ' + testId + '</p>');
-
-
-        
-        // LIFF IDのプレースホルダーを追加
-        const liffId = '2007576580-4q0azmME'; 
-
-        // LIFF IDをページに直接表示する（デバッグ用）
-        document.write('<p>LIFF ID: ' + liffId + '</p>');
+        // ★ここにCloud Functions URLのプレースホルダーを「手入力」してください★
+        // const cloudFunctionUrl = '_CLOUD_FUNCTION_URL_PLACEHOLDER_';
+        // この行はデバッグ用。後で削除するかコメントアウトします
+        document.write('<p>Cloud Function URL from HTML: ' + '_CLOUD_FUNCTION_URL_PLACEHOLDER_' + '</p>');
     </script>
 </body>
 </html>
