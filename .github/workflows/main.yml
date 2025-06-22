@@ -1,9 +1,7 @@
 name: Deploy to GitHub Pages
-
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
 
 permissions:
   contents: read
@@ -17,42 +15,25 @@ jobs:
       name: github-pages
 
     steps:
-      - name: "Checkout repository"
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: "🔍 Debug: プレースホルダ確認（置換前）"
-        run: |
-          echo "::group::index.html (before)"
-          cat index.html
-          echo "::endgroup::"
-
-      - name: "🔐 Check SECRET_KEY length"
+      - name: Inject config into HTML
         env:
-          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          LIFF_ID: ${{ secrets.LIFF_ID }}
+          CLOUD_FUNCTION_URL: ${{ secrets.CLOUD_FUNCTION_URL }}
         run: |
-          echo "SECRET_KEY length: ${#SECRET_KEY}"
+          sed -i "s/{{LIFF_ID}}/${LIFF_ID//\//\\/}/g" index.html
+          sed -i "s|{{CLOUD_FUNCTION_URL}}|${CLOUD_FUNCTION_URL//|/\\|}|g" index.html
 
-      - name: "Inject secret into HTML"
-        env:
-          SECRET_KEY: ${{ secrets.SECRET_KEY }}
-        run: |
-          sed -i "s/{{SECRET_KEY}}/${SECRET_KEY//\//\\/}/g" index.html
-
-      - name: "🔍 Debug: プレースホルダ確認（置換後）"
-        run: |
-          echo "::group::index.html (after)"
-          cat index.html
-          echo "::endgroup::"
-
-      - name: "Prepare artifact directory"
+      - name: Prepare artifact directory
         run: |
           mkdir -p public
           mv index.html public/index.html
 
-      - name: "Upload Pages artifact"
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: public
 
-      - name: "Deploy to GitHub Pages"
+      - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
