@@ -1,21 +1,19 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TEST_VAR Display Test</title>
+  <meta charset="UTF-8">
+  <title>シークレット埋め込みテスト</title>
 </head>
 <body>
-    <h1>GitHub Variable Test</h1>
-    <p>The value of TEST_VAR should appear below:</p>
+  <h1>シークレット埋め込みテストページ</h1>
+  <p id="secret-area">シークレットはここに表示されます</p>
 
-    
-    <script>
-        // GitHub Variablesのテスト用プレースホルダー
-        const testVariable = 'YOUR_TEST_VARIABLE_PLACEHOLDER'; 
-        
-        // ページに値を表示する
-        document.write('<p>TEST_VAR Value: ' + testVariable + '</p>');
-    </script>
+  <script>
+    (function() {
+      // ワークフローで置換されるプレースホルダ
+      const secret = "{{LIFF_ID}}";
+      document.getElementById("secret-area").innerText = "シークレットの値： " + secret;
+    })();
+  </script>
 </body>
 </html>
