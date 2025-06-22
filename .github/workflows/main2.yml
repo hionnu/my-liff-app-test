@@ -26,7 +26,7 @@ jobs:
           cat index.html
           echo "::endgroup::"
 
-      - name: "🔐 Check SECRET_KEY length"
+      - name: "🔐 Check SECRET_KEY2 length"
         env:
           SECRET_KEY2: ${{ secrets.SECRET_KEY2 }}
         run: |
