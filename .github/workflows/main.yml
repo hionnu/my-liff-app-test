@@ -30,6 +30,9 @@ jobs:
           
           # 2. GitHub Variablesの値を置換
           sed -i "s|YOUR_TEST_VARIABLE_PLACEHOLDER|${{ vars.TEST_VAR }}|g" index.html
+
+          # 3. GitHub SecretsのLIFF IDの値を置換
+          sed -i "s|YOUR_LIFF_ID_PLACEHOLDER|${{ secrets.LIFF_ID }}|g" index.html
           
           echo "--- index.html content after sed ---"
           cat index.html
