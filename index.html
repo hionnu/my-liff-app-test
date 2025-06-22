@@ -10,8 +10,9 @@
 
   <script>
     (function(){
-      const secret = "{{SECRET_KEY}}"; 
-      document.getElementById("secret-area").innerText = "秘密の値：" + secret;
+      // ビルド時に置換されるプレースホルダ
+      const secret = "{{SECRET_KEY}}";
+      document.getElementById("secret-area").innerText = "秘密の値： " + secret;
     })();
   </script>
 </body>
