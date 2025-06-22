@@ -30,11 +30,11 @@ jobs:
         env:
           SECRET_KEY: ${{ secrets.LIFF_ID }}
         run: |
-          echo "SECRET_KEY length: ${#LIFF_ID}"
+          echo "LIFF_ID length: ${#LIFF_ID}"
 
       - name: "Inject secret into HTML"
         env:
-          SECRET_KEY: ${{ secrets.LIFF_ID }}
+          LIFF_ID: ${{ secrets.LIFF_ID }}
         run: |
           sed -i "s/{{LIFF_ID}}/${LIFF_ID//\//\\/}/g" index.html
 
