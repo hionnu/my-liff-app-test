@@ -6,38 +6,37 @@ on:
       - main
 
 permissions:
-  contents: read      # リポジトリの読み取り
-  pages: write        # GitHub Pages への書き込み
-  id-token: write     # OIDC トークン取得に必要
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
+    # ← ここを追加
+    environment:
+      name: github-pages
+
     steps:
-      # リポジトリの内容をチェックアウト
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # シークレットを index.html に埋め込む
       - name: Inject secret into HTML
         env:
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: |
           sed -i "s/{{SECRET_KEY}}/${SECRET_KEY//\//\\/}/g" index.html
 
-      # public フォルダを作って index.html を移動
       - name: Prepare artifact directory
         run: |
           mkdir -p public
           mv index.html public/index.html
 
-      # Pages 用アーティファクトをアップロード
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: public
 
-      # GitHub Pages にデプロイ
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
