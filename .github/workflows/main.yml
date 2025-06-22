@@ -6,9 +6,9 @@ on:
       - main
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: read      # リポジトリの読み取り
+  pages: write        # GitHub Pages への書き込み
+  id-token: write     # OIDC トークン取得に必要
 
 jobs:
   build-and-deploy:
@@ -26,17 +26,23 @@ jobs:
           cat index.html
           echo "::endgroup::"
 
-      - name: "🔐 Check SECRET_KEY length"
+      - name: "🔐 Check SECRET_KEY and SECRET_KEY2 length"
         env:
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          SECRET_KEY2: ${{ secrets.SECRET_KEY2 }}
         run: |
           echo "SECRET_KEY length: ${#SECRET_KEY}"
+          echo "SECRET_KEY2 length: ${#SECRET_KEY2}"
 
-      - name: "Inject secret into HTML"
+      - name: "Inject secrets into HTML"
         env:
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          SECRET_KEY2: ${{ secrets.SECRET_KEY2 }}
         run: |
+          # SECRET_KEY を置換
           sed -i "s/{{SECRET_KEY}}/${SECRET_KEY//\//\\/}/g" index.html
+          # SECRET_KEY2 を置換
+          sed -i "s/{{SECRET_KEY2}}/${SECRET_KEY2//\//\\/}/g" index.html
 
       - name: "🔍 Debug: プレースホルダ確認（置換後）"
         run: |
