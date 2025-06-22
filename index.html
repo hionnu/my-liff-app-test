@@ -3,22 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secrets Replacement Test</title>
+    <title>TEST_VAR Display Test</title>
 </head>
 <body>
-    <h1>Secrets Replacement Test Page</h1>
-    <p>This page tests if secrets are correctly replaced.</p>
+    <h1>GitHub Variable Test</h1>
+    <p>The value of TEST_VAR should appear below:</p>
     
     <script>
-        // ★ここにLIFF IDのプレースホルダーを「手入力」してください★
-        const liffId = '_LIFF_ID_PLACEHOLDER_'; 
-        // この行はデバッグ用。後で削除するかコメントアウトします
-        document.write('<p>LIFF ID from HTML: ' + '_LIFF_ID_PLACEHOLDER_' + '</p>');
-
-        // ★ここにCloud Functions URLのプレースホルダーを「手入力」してください★
-        const cloudFunctionUrl = '_CLOUD_FUNCTION_URL_PLACEHOLDER_';
-        // この行はデバッグ用。後で削除するかコメントアウトします
-        document.write('<p>Cloud Function URL from HTML: ' + '_CLOUD_FUNCTION_URL_PLACEHOLDER_' + '</p>');
+        // GitHub Variablesのテスト用プレースホルダー
+        const testVariable = 'YOUR_TEST_VARIABLE_PLACEHOLDER'; 
+        
+        // ページに値を表示する
+        document.write('<p>TEST_VAR Value: ' + testVariable + '</p>');
     </script>
 </body>
 </html>
