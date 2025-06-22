@@ -9,7 +9,7 @@
 +permissions:
 +  contents: read     # コードの読み取り
 +  pages: write       # Pages への書き込み
-+  id-token: write    # OIDC トークン取得に必要
++  id-token: write    # OIDC トークン取得に必
 
  jobs:
    build-and-deploy:
