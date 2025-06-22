@@ -1,4 +1,5 @@
 name: Deploy to GitHub Pages
+
 on:
   push:
     branches:
@@ -16,45 +17,42 @@ jobs:
       name: github-pages
 
     steps:
-      - name: Checkout repository
+      - name: "Checkout repository"
         uses: actions/checkout@v3
 
-      # ──────────────────────────────
-      - name: 🔍 Debug: プレースホルダ確認（置換前）
+      - name: "🔍 Debug: プレースホルダ確認（置換前）"
         run: |
           echo "::group::index.html (before)"
           cat index.html
           echo "::endgroup::"
 
-      - name: 🔐 Check SECRET_KEY length
+      - name: "🔐 Check SECRET_KEY length"
         env:
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: |
-          # 長さだけ見ることで「値が渡っているか」を確認（実値はマスクされます）
           echo "SECRET_KEY length: ${#SECRET_KEY}"
 
-      - name: Inject secret into HTML
+      - name: "Inject secret into HTML"
         env:
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: |
           sed -i "s/{{SECRET_KEY}}/${SECRET_KEY//\//\\/}/g" index.html
 
-      - name: 🔍 Debug: プレースホルダ確認（置換後）
+      - name: "🔍 Debug: プレースホルダ確認（置換後）"
         run: |
           echo "::group::index.html (after)"
           cat index.html
           echo "::endgroup::"
-      # ──────────────────────────────
 
-      - name: Prepare artifact directory
+      - name: "Prepare artifact directory"
         run: |
           mkdir -p public
           mv index.html public/index.html
 
-      - name: Upload Pages artifact
+      - name: "Upload Pages artifact"
         uses: actions/upload-pages-artifact@v3
         with:
           path: public
 
-      - name: Deploy to GitHub Pages
+      - name: "Deploy to GitHub Pages"
         uses: actions/deploy-pages@v4
