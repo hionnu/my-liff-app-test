@@ -26,17 +26,17 @@ jobs:
           cat index.html
           echo "::endgroup::"
 
-      - name: "🔐 Check LIFF_ID length"
+      - name: "🔐 Check SECRET_KEY length"
         env:
-          SECRET_KEY: ${{ secrets.LIFF_ID }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: |
-          echo "LIFF_ID length: ${#LIFF_ID}"
+          echo "SECRET_KEY length: ${#SECRET_KEY}"
 
       - name: "Inject secret into HTML"
         env:
-          LIFF_ID: ${{ secrets.LIFF_ID }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: |
-          sed -i "s/{{LIFF_ID}}/${LIFF_ID//\//\\/}/g" index.html
+          sed -i "s/{{SECRET_KEY}}/${SECRET_KEY//\//\\/}/g" index.html
 
       - name: "🔍 Debug: プレースホルダ確認（置換後）"
         run: |
