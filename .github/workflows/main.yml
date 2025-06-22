@@ -1,40 +1,32 @@
-name: Test Variable Replacement
+name: Deploy to GitHub Pages
 
 on:
   push:
-    branches:
-      - main # あなたのデプロイ対象ブランチに合わせてください (例: master, gh-pages)
-
-permissions:
-  contents: write
-  pages: write
-  id-token: write
+    branches: [ main ]
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
+      # 1. コードをチェックアウト
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
-      - name: Replace Test Variable Placeholder
+      # 2. html.template をコピーしてプレースホルダ置換
+      - name: Generate HTML with secret
+        env:
+          SECRET_KEY: ${{ secrets.LIFF_ID }}
         run: |
-          # ★デバッグ用: sed実行前のindex.htmlの内容を出力します★
-          echo "--- index.html content BEFORE sed ---"
-          cat index.html
-          echo "-------------------------------------"
-          
-          # GitHub Variablesの値を置換
-          sed -i "s|YOUR_TEST_VARIABLE_PLACEHOLDER|${{ vars.TEST_VAR }}|g" index.html
-          
-          # ★デバッグ用: sed実行後のindex.htmlの内容を出力します★
-          echo "--- index.html content AFTER sed ---"
-          cat index.html
-          echo "------------------------------------"
+          cp html.template index.html
+          # Bash の文字列置換でプレースホルダを秘密情報に書き換え
+          sed -i "s/{{LIFF_ID}}/${LIFF_ID//\//\\/}/g" index.html
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
+      # 3. Pages 用のアーティファクトをアップロード
+      - name: Upload artifact for GitHub Pages
+        uses: actions/upload-pages-artifact@v1
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./
+          path: index.html
+
+      # 4. GitHub Pages へデプロイ
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v1
