@@ -1,0 +1,39 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main # ★重要: ここをあなたのデプロイ対象ブランチに合わせてください (例: master, main, gh-pagesなど)
+
+permissions:
+  contents: write # GitHub Pagesに書き込むための権限
+  pages: write    # GitHub Pagesに書き込むための権限
+  id-token: write # OpenID Connect (OIDC) のための権限。Pagesデプロイに必要な場合があります。
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest # 実行環境
+
+    steps:
+      # 1. リポジトリのコードをチェックアウトする
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. index.html のプレースホルダーを Secrets の値に置き換える
+      #    Linuxコマンドの `sed` を使います。
+      #    `sed -i` はファイルを直接編集するオプションです。
+      #    `s|古い文字列|新しい文字列|g` は「古い文字列」を「新しい文字列」に全て置換するコマンドです。
+      #    Secretsは ${{ secrets.シークレット名 }} の形式で参照します。
+      - name: Replace placeholders in index.html
+        run: |
+          sed -i "s|YOUR_LIFF_ID_PLACEHOLDER|${{ secrets.LIFF_ID }}|g" index.html
+          sed -i "s|YOUR_CLOUD_FUNCTION_URL_PLACEHOLDER|${{ secrets.CLOUD_FUNCTION_URL }}|g" index.html
+
+      # 3. GitHub Pages にデプロイする
+      #    peaceiris/actions-gh-pages は、GitHub Pagesへのデプロイを簡単に行うためのActionsです。
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4 # デプロイ用のアクション
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }} # GitHubが自動で提供してくれるトークン
+          publish_dir: ./ # デプロイしたいファイルがあるディレクトリ（ここではルートディレクトリ）
+
