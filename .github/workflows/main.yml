@@ -1,4 +1,4 @@
-name: Debug Cloud Functions URL Replacement
+name: Debug Sed and Variables Replacement
 
 on:
   push:
@@ -18,16 +18,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Cloud Functions URLのプレースホルダーのみを置き換える
-      - name: Replace Cloud Functions URL placeholder
+      - name: Replace placeholders for test
         run: |
           # ★デバッグ用: index.html の内容をログに出力します★
           echo "--- index.html content before sed ---"
           cat index.html
           echo "-------------------------------------"
           
-          # sedコマンドを実行
-          sed -i "s|YOUR_CLOUD_FUNCTION_URL_PLACEHOLDER|${{ secrets.CLOUD_FUNCTION_URL }}|g" index.html
+          # 1. 単純なテキストを置換 (ハードコードされた文字列)
+          sed -i "s|SIMPLE_TEXT_PLACEHOLDER|HelloSedTest!|g" index.html
+          
+          # 2. GitHub Variablesの値を置換
+          sed -i "s|YOUR_TEST_VARIABLE_PLACEHOLDER|${{ vars.TEST_VAR }}|g" index.html
+          
+          echo "--- index.html content after sed ---"
+          cat index.html
+          echo "------------------------------------"
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
