@@ -2,17 +2,16 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>シークレット埋め込みテスト</title>
+  <title>Secret テスト</title>
 </head>
 <body>
-  <h1>シークレット埋め込みテストページ</h1>
-  <p id="secret-area">シークレットはここに表示されます</p>
+  <h1>シークレット表示テスト</h1>
+  <p id="secret-area">秘密：{{SECRET_KEY}}</p>
 
   <script>
-    (function() {
-      // ワークフローで置換されるプレースホルダ
-      const secret = "{{SECRET_KEY}}";
-      document.getElementById("secret-area").innerText = "シークレットの値： " + secret;
+    (function(){
+      const secret = "{{SECRET_KEY}}"; 
+      document.getElementById("secret-area").innerText = "秘密の値：" + secret;
     })();
   </script>
 </body>
