@@ -34,12 +34,9 @@ jobs:
 
       - name: "Inject secret into HTML"
         env:
-          LIFF_ID: ${{ secrets.LIFF_ID }}
-          CLOUD_FUNCTION_URL: ${{ secrets.CLOUD_FUNCTION_URL }}
+          SECRET_KEY: ${{ secrets.LIFF_ID }}
         run: |
           sed -i "s/{{LIFF_ID}}/${LIFF_ID//\//\\/}/g" index.html
-          sed -i "s|{{CLOUD_FUNCTION_URL}}|${CLOUD_FUNCTION_URL//|/\\|}|g" index.html
-
 
       - name: "🔍 Debug: プレースホルダ確認（置換後）"
         run: |
