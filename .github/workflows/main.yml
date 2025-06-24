@@ -8,7 +8,7 @@ on:
 permissions:
   contents: read      # リポジトリの読み取り
   pages: write        # GitHub Pages への書き込み
-  id-token: write     # OIDC トークン取得に必要
+  id-token: write     # OIDC トークン取得
 
 jobs:
   build-and-deploy:
