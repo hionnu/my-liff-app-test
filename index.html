@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>注文受付フォーム</title>
+    <title>注文受付</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -64,6 +64,59 @@
             color: var(--color-text-muted);
             opacity: 0.7;
         }
+
+        /* Tab specific styles */
+        .tab-button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem 0.75rem 0 0; /* rounded-t-xl equivalent */
+            font-weight: 600; /* font-semibold equivalent */
+            color: var(--color-text-muted);
+            background-color: var(--color-card-bg);
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-button.active {
+            color: var(--color-corporate-navy); /* Active tab text color */
+            background-color: var(--color-card-bg);
+            border-bottom: 3px solid var(--color-corporate-navy); /* Active tab indicator */
+        }
+
+        .tab-button:hover:not(.active) {
+            color: var(--color-text-dark);
+            background-color: var(--color-primary-bg); /* Slight background change on hover */
+        }
+
+        .tab-content {
+            display: none;
+            padding-top: 1.5rem; /* pt-6 equivalent */
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Custom scrollbar for order history */
+        .order-history-scroll {
+            max-height: 70vh; /* Adjust as needed */
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        }
+        .order-history-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+        .order-history-scroll::-webkit-scrollbar-track {
+            background: var(--color-primary-bg);
+            border-radius: 10px;
+        }
+        .order-history-scroll::-webkit-scrollbar-thumb {
+            background: var(--color-corporate-green);
+            border-radius: 10px;
+        }
+        .order-history-scroll::-webkit-scrollbar-thumb:hover {
+            background: #218c4c; /* Darker green on hover */
+        }
     </style>
     <!-- LIFF SDK -->
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
@@ -74,140 +127,165 @@
             <i class="bi bi-box-seam inline-block align-middle text-corporate-green mr-3"></i> 注文受付
         </h1>
 
-        <!-- 注文フォーム -->
-        <form id="orderForm" class="space-y-6">
-            <!-- 会社名・氏名 -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="form-group">
-                    <label for="companyName" class="block text-text-dark text-sm font-semibold mb-2 required">
-                        <i class="bi bi-building text-corporate-green mr-2"></i> 会社名
-                    </label>
-                    <input type="text" id="companyName" required
-                           class="w-full p-3.5 rounded-lg bg-corporate-green-light border border-border-subtle text-text-dark placeholder-text-muted
-                                 focus:outline-none focus:ring-2 focus:ring-corporate-navy focus-ring-corporate-navy text-base">
-                </div>
-                <div class="form-group">
-                    <label for="fullName" class="block text-text-dark text-sm font-semibold mb-2 required">
-                        <i class="bi bi-person-badge text-corporate-green mr-2"></i> 氏名
-                    </label>
-                    <input type="text" id="fullName" required
-                           class="w-full p-3.5 rounded-lg bg-corporate-green-light border border-border-subtle text-text-dark placeholder-text-muted
-                                 focus:outline-none focus:ring-2 focus:ring-corporate-navy focus-ring-corporate-navy text-base">
-                </div>
-            </div>
-
-            <!-- メールアドレス・電話番号 -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="form-group">
-                    <label for="email" class="block text-text-dark text-sm font-semibold mb-2 required">
-                        <i class="bi bi-envelope-fill text-corporate-green mr-2"></i> メールアドレス
-                    </label>
-                    <input type="email" id="email" required
-                           class="w-full p-3.5 rounded-lg bg-corporate-green-light border border-border-subtle text-text-dark placeholder-text-muted
-                                 focus:outline-none focus:ring-2 focus:ring-corporate-navy focus-ring-corporate-navy text-base">
-                </div>
-                <div class="form-group">
-                    <label for="phoneNumber" class="block text-text-dark text-sm font-semibold mb-2 required">
-                        <i class="bi bi-phone-fill text-corporate-green mr-2"></i> 電話番号
-                    </label>
-                    <input type="tel" id="phoneNumber" pattern="[0-9\-]+" title="半角数字とハイフンのみ" required
-                           class="w-full p-3.5 rounded-lg bg-corporate-green-light border border-border-subtle text-text-dark placeholder-text-muted
-                                 focus:outline-none focus:ring-2 focus:ring-corporate-navy focus-ring-corporate-navy text-base">
-                </div>
-            </div>
-
-            <!-- 納品先 -->
-            <div class="form-group">
-                <label for="deliveryAddress" class="block text-text-dark text-sm font-semibold mb-2 required">
-                    <i class="bi bi-geo-alt-fill text-corporate-green mr-2"></i> 納品先
-                </label>
-                <input type="text" id="deliveryAddress" required
-                       class="w-full p-3.5 rounded-lg bg-corporate-green-light border border-border-subtle text-text-dark placeholder-text-muted
-                             focus:outline-none focus:ring-2 focus:ring-corporate-navy focus-ring-corporate-navy text-base"
-                       placeholder="例: 東京都渋谷区神南1-2-3 〇〇ビル">
-            </div>
-
-            <!-- 注文内容 -->
-            <div class="form-group">
-                <label for="orderContent" class="block text-text-dark text-sm font-semibold mb-2 required">
-                    <i class="bi bi-card-text text-corporate-green mr-2"></i> 注文内容
-                </label>
-                <textarea id="orderContent" required rows="4"
-                          class="w-full p-3.5 rounded-lg bg-corporate-green-light border border-border-subtle text-text-dark resize-y placeholder-text-muted
-                                focus:outline-none focus:ring-2 focus:ring-corporate-navy focus-ring-corporate-navy text-base"
-                          placeholder="明細は改行して入力してください"></textarea>
-            </div>
-
-            <!-- 特記事項 -->
-            <div class="form-group">
-                <label for="notes" class="block text-text-dark text-sm font-semibold mb-2">
-                    <i class="bi bi-journal-text text-corporate-green mr-2"></i> 特記事項 (任意)
-                </label>
-                <textarea id="notes" rows="2"
-                          class="w-full p-3.5 rounded-lg bg-corporate-green-light border border-border-subtle text-text-dark resize-y placeholder-text-muted
-                                focus:outline-none focus:ring-2 focus:ring-corporate-navy focus-ring-corporate-navy text-base"></textarea>
-            </div>
-
-            <!-- 日付・時間関連 -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="form-group">
-                    <label for="deliveryDate" class="block text-text-dark text-sm font-semibold mb-2 required">
-                        <i class="bi bi-calendar-check text-corporate-green mr-2"></i> 配送日
-                    </label>
-                    <input type="date" id="deliveryDate" required
-                           class="w-full p-3.5 rounded-lg bg-corporate-green-light border border-border-subtle text-text-dark
-                                 focus:outline-none focus:ring-2 focus:ring-corporate-navy focus-ring-corporate-navy text-base">
-                </div>
-                <div class="form-group">
-                    <label for="deliveryTime" class="block text-text-dark text-sm font-semibold mb-2 required">
-                        <i class="bi bi-clock-fill text-corporate-green mr-2"></i> 希望納品時間
-                    </label>
-                    <input type="time" id="deliveryTime" required
-                           class="w-full p-3.5 rounded-lg bg-corporate-green-light border border-border-subtle text-text-dark
-                                 focus:outline-none focus:ring-2 focus:ring-corporate-navy focus-ring-corporate-navy text-base">
-                </div>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="form-group">
-                    <label for="scaffoldDate" class="block text-text-dark text-sm font-semibold mb-2">
-                        <i class="bi bi-hammer text-corporate-green mr-2"></i> 足場組立日 (任意)
-                    </label>
-                    <input type="date" id="scaffoldDate"
-                           class="w-full p-3.5 rounded-lg bg-corporate-green-light border border-border-subtle text-text-dark
-                                 focus:outline-none focus:ring-2 focus:ring-corporate-navy focus-ring-corporate-navy text-base">
-                </div>
-                <div class="form-group">
-                    <label for="jotoDate" class="block text-text-dark text-sm font-semibold mb-2">
-                        <i class="bi bi-house-door-fill text-corporate-green mr-2"></i> 上棟日 (任意)
-                    </label>
-                    <input type="date" id="jotoDate"
-                           class="w-full p-3.5 rounded-lg bg-corporate-green-light border border-border-subtle text-text-dark
-                                 focus:outline-none focus:ring-2 focus:ring-corporate-navy focus-ring-corporate-navy text-base">
-                </div>
-            </div>
-            
-            <!-- File Upload Section -->
-            <div class="form-group bg-corporate-green-light p-6 rounded-xl shadow-md-custom border border-corporate-green">
-                <label class="block text-text-dark text-lg font-semibold mb-3">
-                    <i class="bi bi-paperclip text-corporate-green mr-2"></i> 添付ファイル (任意, 最大3つまで)
-                </label>
-                <input type="file" id="fileInput" accept="image/*, .pdf" multiple
-                       class="w-full text-text-dark text-sm file:mr-4 file:py-2 file:px-4
-                              file:rounded-full file:border-0 file:text-sm file:font-semibold
-                              file:bg-corporate-navy file:text-white hover:file:bg-[#003B7F] cursor-pointer">
-                <div id="fileList" class="mt-4 space-y-2 text-text-muted text-sm">
-                    <!-- 選択されたファイルが表示される -->
-                </div>
-            </div>
-
-            <button type="submit" id="submitOrder"
-                    class="bg-corporate-green text-white p-4 rounded-xl font-bold text-xl w-full
-                           hover:bg-green-700 transition duration-300 ease-in-out shadow-lg-custom
-                           flex items-center justify-center">
-                <i class="bi bi-send-fill mr-3"></i> 注文を送信する
+        <!-- Tab Headers -->
+        <div class="flex border-b border-border-subtle mb-6 -mt-4">
+            <button id="orderFormTab" class="tab-button active flex-1" onclick="showTab('orderFormContent', 'orderFormTab')">
+                <i class="bi bi-pencil-square mr-2"></i> 注文受付
             </button>
-            <p id="statusMessage" class="mt-4 text-center text-base font-medium text-text-dark"></p>
-        </form>
+            <button id="pastOrdersTab" class="tab-button flex-1" onclick="showTab('pastOrdersContent', 'pastOrdersTab')">
+                <i class="bi bi-clock-history mr-2"></i> 過去の注文
+            </button>
+        </div>
+
+        <!-- Tab Contents -->
+        <div id="orderFormContent" class="tab-content active">
+            <!-- 注文フォーム -->
+            <form id="orderForm" class="space-y-6">
+                <!-- 会社名・氏名 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="form-group">
+                        <label for="companyName" class="block text-text-dark text-sm font-semibold mb-2 required">
+                            <i class="bi bi-building text-corporate-green mr-2"></i> 会社名
+                        </label>
+                        <input type="text" id="companyName" required
+                               class="w-full p-3.5 rounded-lg bg-corporate-green-light border border-border-subtle text-text-dark placeholder-text-muted
+                                     focus:outline-none focus:ring-2 focus:ring-corporate-navy focus-ring-corporate-navy text-base">
+                    </div>
+                    <div class="form-group">
+                        <label for="fullName" class="block text-text-dark text-sm font-semibold mb-2 required">
+                            <i class="bi bi-person-badge text-corporate-green mr-2"></i> 氏名
+                        </label>
+                        <input type="text" id="fullName" required
+                               class="w-full p-3.5 rounded-lg bg-corporate-green-light border border-border-subtle text-text-dark placeholder-text-muted
+                                     focus:outline-none focus:ring-2 focus:ring-corporate-navy focus-ring-corporate-navy text-base">
+                    </div>
+                </div>
+
+                <!-- メールアドレス・電話番号 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="form-group">
+                        <label for="email" class="block text-text-dark text-sm font-semibold mb-2 required">
+                            <i class="bi bi-envelope-fill text-corporate-green mr-2"></i> メールアドレス
+                        </label>
+                        <input type="email" id="email" required
+                               class="w-full p-3.5 rounded-lg bg-corporate-green-light border border-border-subtle text-text-dark placeholder-text-muted
+                                     focus:outline-none focus:ring-2 focus:ring-corporate-navy focus-ring-corporate-navy text-base">
+                    </div>
+                    <div class="form-group">
+                        <label for="phoneNumber" class="block text-text-dark text-sm font-semibold mb-2 required">
+                            <i class="bi bi-phone-fill text-corporate-green mr-2"></i> 電話番号
+                        </label>
+                        <input type="tel" id="phoneNumber" pattern="[0-9\-]+" title="半角数字とハイフンのみ" required
+                               class="w-full p-3.5 rounded-lg bg-corporate-green-light border border-border-subtle text-text-dark placeholder-text-muted
+                                     focus:outline-none focus:ring-2 focus:ring-corporate-navy focus-ring-corporate-navy text-base">
+                    </div>
+                </div>
+
+                <!-- 納品先 -->
+                <div class="form-group">
+                    <label for="deliveryAddress" class="block text-text-dark text-sm font-semibold mb-2 required">
+                        <i class="bi bi-geo-alt-fill text-corporate-green mr-2"></i> 納品先
+                    </label>
+                    <input type="text" id="deliveryAddress" required
+                           class="w-full p-3.5 rounded-lg bg-corporate-green-light border border-border-subtle text-text-dark placeholder-text-muted
+                                 focus:outline-none focus:ring-2 focus:ring-corporate-navy focus-ring-corporate-navy text-base"
+                           placeholder="例: 東京都渋谷区神南1-2-3 〇〇ビル">
+                </div>
+
+                <!-- 注文内容 -->
+                <div class="form-group">
+                    <label for="orderContent" class="block text-text-dark text-sm font-semibold mb-2 required">
+                        <i class="bi bi-card-text text-corporate-green mr-2"></i> 注文内容
+                    </label>
+                    <textarea id="orderContent" required rows="4"
+                              class="w-full p-3.5 rounded-lg bg-corporate-green-light border border-border-subtle text-text-dark resize-y placeholder-text-muted
+                                    focus:outline-none focus:ring-2 focus:ring-corporate-navy focus-ring-corporate-navy text-base"
+                              placeholder="明細は改行して入力してください"></textarea>
+                </div>
+
+                <!-- 特記事項 -->
+                <div class="form-group">
+                    <label for="notes" class="block text-text-dark text-sm font-semibold mb-2">
+                        <i class="bi bi-journal-text text-corporate-green mr-2"></i> 特記事項 (任意)
+                    </label>
+                    <textarea id="notes" rows="2"
+                              class="w-full p-3.5 rounded-lg bg-corporate-green-light border border-border-subtle text-text-dark resize-y placeholder-text-muted
+                                    focus:outline-none focus:ring-2 focus:ring-corporate-navy focus-ring-corporate-navy text-base"></textarea>
+                </div>
+
+                <!-- 日付・時間関連 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="form-group">
+                        <label for="deliveryDate" class="block text-text-dark text-sm font-semibold mb-2 required">
+                            <i class="bi bi-calendar-check text-corporate-green mr-2"></i> 配送日
+                        </label>
+                        <input type="date" id="deliveryDate" required
+                               class="w-full p-3.5 rounded-lg bg-corporate-green-light border border-border-subtle text-text-dark
+                                     focus:outline-none focus:ring-2 focus:ring-corporate-navy focus-ring-corporate-navy text-base">
+                    </div>
+                    <div class="form-group">
+                        <label for="deliveryTime" class="block text-text-dark text-sm font-semibold mb-2 required">
+                            <i class="bi bi-clock-fill text-corporate-green mr-2"></i> 希望納品時間
+                        </label>
+                        <input type="time" id="deliveryTime" required
+                               class="w-full p-3.5 rounded-lg bg-corporate-green-light border border-border-subtle text-text-dark
+                                     focus:outline-none focus:ring-2 focus:ring-corporate-navy focus-ring-corporate-navy text-base">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="form-group">
+                        <label for="scaffoldDate" class="block text-text-dark text-sm font-semibold mb-2">
+                            <i class="bi bi-hammer text-corporate-green mr-2"></i> 足場組立日 (任意)
+                        </label>
+                        <input type="date" id="scaffoldDate"
+                               class="w-full p-3.5 rounded-lg bg-corporate-green-light border border-border-subtle text-text-dark
+                                     focus:outline-none focus:ring-2 focus:ring-corporate-navy focus-ring-corporate-navy text-base">
+                    </div>
+                    <div class="form-group">
+                        <label for="jotoDate" class="block text-text-dark text-sm font-semibold mb-2">
+                            <i class="bi bi-house-door-fill text-corporate-green mr-2"></i> 上棟日 (任意)
+                        </label>
+                        <input type="date" id="jotoDate"
+                               class="w-full p-3.5 rounded-lg bg-corporate-green-light border border-border-subtle text-text-dark
+                                     focus:outline-none focus:ring-2 focus:ring-corporate-navy focus-ring-corporate-navy text-base">
+                    </div>
+                </div>
+                
+                <!-- File Upload Section -->
+                <div class="form-group bg-corporate-green-light p-6 rounded-xl shadow-md-custom border border-corporate-green">
+                    <label class="block text-text-dark text-lg font-semibold mb-3">
+                        <i class="bi bi-paperclip text-corporate-green mr-2"></i> 添付ファイル (任意, 最大3つまで)
+                    </label>
+                    <input type="file" id="fileInput" accept="image/*, .pdf" multiple
+                           class="w-full text-text-dark text-sm file:mr-4 file:py-2 file:px-4
+                                  file:rounded-full file:border-0 file:text-sm file:font-semibold
+                                  file:bg-corporate-navy file:text-white hover:file:bg-[#003B7F] cursor-pointer">
+                    <div id="fileList" class="mt-4 space-y-2 text-text-muted text-sm">
+                        <!-- 選択されたファイルが表示される -->
+                    </div>
+                </div>
+
+                <button type="submit" id="submitOrder"
+                        class="bg-corporate-green text-white p-4 rounded-xl font-bold text-xl w-full
+                               hover:bg-green-700 transition duration-300 ease-in-out shadow-lg-custom
+                               flex items-center justify-center">
+                    <i class="bi bi-send-fill mr-3"></i> 注文を送信する
+                </button>
+                <p id="statusMessage" class="mt-4 text-center text-base font-medium text-text-dark"></p>
+            </form>
+        </div>
+
+        <!-- 過去の注文内容 -->
+        <div id="pastOrdersContent" class="tab-content">
+            <h2 class="text-2xl font-bold text-text-dark text-center mb-6">
+                <i class="bi bi-archive text-corporate-navy mr-2"></i> 過去の注文履歴
+            </h2>
+            <p id="pastOrdersStatus" class="text-center text-text-muted mb-4">過去の注文を読み込み中...</p>
+            <div id="pastOrdersList" class="order-history-scroll space-y-4">
+                <!-- Past orders will be loaded here by JavaScript -->
+                <p class="text-center text-text-muted">ここに過去の注文が表示されます。</p>
+            </div>
+        </div>
 
         <!-- ユーザー情報セクション (最下部に移動) -->
         <div class="mt-8 pt-4 border-t border-border-subtle text-xs text-text-muted text-center">
@@ -228,6 +306,8 @@
         const userIdDisplay = document.getElementById('userIdDisplay');
         const userNameDisplay = document.getElementById('userNameDisplay');
         const statusMessage = document.getElementById('statusMessage');
+        const pastOrdersStatus = document.getElementById('pastOrdersStatus'); // New
+        const pastOrdersList = document.getElementById('pastOrdersList');     // New
         const versionInfoElement = document.getElementById('versionInfo'); 
         const submitOrderButton = document.getElementById('submitOrder');
         const fileInput = document.getElementById('fileInput');
@@ -237,6 +317,29 @@
         let currentUserName = '未取得';
         let currentChatRoomId = '未取得'; 
         const uploadedFiles = [];
+
+        // --- Tab Switching Logic ---
+        function showTab(tabContentId, tabButtonId) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            // Deactivate all tab buttons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // Show the selected tab content
+            document.getElementById(tabContentId).classList.add('active');
+            // Activate the selected tab button
+            document.getElementById(tabButtonId).classList.add('active');
+
+            // If switching to past orders tab, load orders
+            if (tabContentId === 'pastOrdersContent' && currentUserId !== '未取得') {
+                loadPastOrders();
+            }
+        }
+
 
         // --- ファイルアップロード関連のJSロジック ---
         fileInput.addEventListener('change', (event) => {
@@ -284,7 +387,7 @@
             fileListDiv.innerHTML = '';
             uploadedFiles.forEach((file, index) => {
                 const fileItem = document.createElement('div');
-                fileItem.classList.add('flex', 'items-center', 'justify-between', 'bg-corporate-green-light', 'p-2', 'rounded-lg', 'shadow-sm');
+                fileItem.classList.add('flex', 'items-center', 'justify-between', 'bg-corporate-navy-light', 'p-2', 'rounded-lg', 'shadow-sm');
                 fileItem.innerHTML = `
                     <span class="text-text-dark text-sm font-medium flex items-center">
                         <i class="bi bi-file-earmark-fill text-corporate-navy mr-2"></i>
@@ -339,6 +442,97 @@
                 throw error; 
             }
         }
+
+        // --- Past Orders Logic ---
+        async function loadPastOrders() {
+            pastOrdersStatus.innerText = '過去の注文を読み込み中...';
+            pastOrdersList.innerHTML = ''; // Clear previous list
+            try {
+                const result = await sendToCloudFunction('get_past_orders', { userId: currentUserId });
+                if (result.success && result.data && result.data.length > 0) {
+                    renderPastOrders(result.data);
+                    pastOrdersStatus.innerText = `過去の注文が見つかりました (${result.data.length}件)。`;
+                    pastOrdersStatus.classList.remove('text-red-500');
+                    pastOrdersStatus.classList.add('text-text-muted');
+                } else {
+                    pastOrdersStatus.innerText = '過去の注文は見つかりませんでした。';
+                    pastOrdersStatus.classList.remove('text-red-500');
+                    pastOrdersStatus.classList.add('text-text-muted');
+                    pastOrdersList.innerHTML = '<p class="text-center text-text-muted">表示する過去の注文はありません。</p>';
+                }
+            } catch (error) {
+                pastOrdersStatus.innerText = `過去の注文の読み込みに失敗しました: ${error.message}`;
+                pastOrdersStatus.classList.add('error', 'text-red-500');
+                console.error('Error loading past orders:', error);
+                pastOrdersList.innerHTML = '<p class="text-center text-red-500">過去の注文を読み込めませんでした。</p>';
+            }
+        }
+
+        function renderPastOrders(orders) {
+            pastOrdersList.innerHTML = ''; // Clear previous list
+            orders.sort((a, b) => new Date(b.inputDateTimeJST) - new Date(a.inputDateTimeJST)); // Sort by date descending
+
+            orders.forEach(order => {
+                const orderCard = document.createElement('div');
+                orderCard.classList.add('bg-corporate-green-light', 'p-4', 'rounded-lg', 'shadow-sm', 'border', 'border-corporate-green');
+                
+                orderCard.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-lg font-semibold text-text-dark break-words w-4/5">${order.companyName || '会社名不明'} - ${order.fullName || '氏名不明'}</h3>
+                        <button type="button" class="copy-order-button bg-corporate-navy text-white px-3 py-1 rounded-full text-sm hover:bg-[#003B7F] transition duration-200 ease-in-out whitespace-nowrap"
+                                data-order='${JSON.stringify(order)}'>
+                            <i class="bi bi-copy mr-1"></i>コピー
+                        </button>
+                    </div>
+                    <p class="text-text-muted text-sm mb-1"><span class="font-semibold">発注番号:</span> ${order.orderTimestamp || '不明'}</p>
+                    <p class="text-text-muted text-sm mb-1"><span class="font-semibold">入力日時:</span> ${order.inputDateTimeJST || '不明'}</p>
+                    <p class="text-text-dark text-base mb-1"><span class="font-semibold">納品先:</span> ${order.deliveryAddress || 'なし'}</p>
+                    <p class="text-text-dark text-base mb-1"><span class="font-semibold">注文内容:</span> <span class="whitespace-pre-wrap">${order.orderContent || 'なし'}</span></p>
+                    <p class="text-text-muted text-sm mb-1"><span class="font-semibold">配送日:</span> ${order.deliveryDate || 'なし'}</p>
+                    <p class="text-text-muted text-sm mb-1"><span class="font-semibold">希望納品時間:</span> ${order.deliveryTime || 'なし'}</p>
+                    <p class="text-text-muted text-sm mb-1"><span class="font-semibold">特記事項:</span> ${order.notes || 'なし'}</p>
+                    ${order.file1URL ? `<p class="text-text-muted text-sm mb-1"><span class="font-semibold">添付ファイル1:</span> <a href="${order.file1URL}" target="_blank" class="text-corporate-navy hover:underline break-all">開く</a></p>` : ''}
+                    ${order.file2URL ? `<p class="text-text-muted text-sm mb-1"><span class="font-semibold">添付ファイル2:</span> <a href="${order.file2URL}" target="_blank" class="text-corporate-navy hover:underline break-all">開く</a></p>` : ''}
+                    ${order.file3URL ? `<p class="text-text-muted text-sm mb-1"><span class="font-semibold">添付ファイル3:</span> <a href="${order.file3URL}" target="_blank" class="text-corporate-navy hover:underline break-all">開く</a></p>` : ''}
+                `;
+                pastOrdersList.appendChild(orderCard);
+            });
+
+            // Add event listeners for copy buttons
+            document.querySelectorAll('.copy-order-button').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const orderData = JSON.parse(event.currentTarget.dataset.order);
+                    copyOrderToForm(orderData);
+                });
+            });
+        }
+
+        function copyOrderToForm(order) {
+            document.getElementById('companyName').value = order.companyName || '';
+            document.getElementById('fullName').value = order.fullName || '';
+            document.getElementById('email').value = order.email || '';
+            document.getElementById('phoneNumber').value = order.phoneNumber || '';
+            document.getElementById('deliveryAddress').value = order.deliveryAddress || '';
+            document.getElementById('orderContent').value = order.orderContent || '';
+            document.getElementById('notes').value = order.notes || '';
+            
+            // 日付と時間は引き継がないためクリア
+            document.getElementById('deliveryDate').value = '';
+            document.getElementById('deliveryTime').value = '';
+            document.getElementById('scaffoldDate').value = '';
+            document.getElementById('jotoDate').value = '';
+
+            // ファイル入力はクリア（再選択が必要なため）
+            uploadedFiles.length = 0; // Clear the array
+            fileInput.value = ''; // Clear the input element
+            renderFileList(); // Update the displayed file list
+
+            showTab('orderFormContent', 'orderFormTab'); // Switch back to the order form tab
+            statusMessage.innerText = '過去の注文内容がフォームにコピーされました（日付・時間は除く）。';
+            statusMessage.classList.remove('text-red-500');
+            statusMessage.classList.add('text-corporate-green'); // Success message color
+        }
+
 
         // LIFF初期化処理
         if (typeof liff === 'undefined') {
@@ -404,15 +598,14 @@
                         }
                     }
 
-
                 } else {
                     liff.login(); 
                 }
             })
             .catch((err) => {
                 console.error("LIFF初期化に失敗しました: ", err);
-                userIdDisplay.innerText = 'エラー: SDK読み込み失敗';
-                userNameDisplay.innerText = 'エラー: SDK読み込み失敗';
+                userIdDisplay.innerText = '初期化エラー';
+                userNameDisplay.innerText = '初期化エラー';
             });
         }
 
@@ -487,6 +680,10 @@
                 if (result.success) {
                     statusMessage.innerText = 'ご注文が送信されました！LINEに確認メッセージが送られました。';
                     statusMessage.classList.add('text-corporate-green'); 
+                    // Clear form after successful submission (optional, depends on UX)
+                    document.getElementById('orderForm').reset(); 
+                    uploadedFiles.length = 0; // Clear uploaded files array
+                    renderFileList(); // Update file list display
                     setTimeout(() => {
                         liff.closeWindow(); 
                     }, 2000); 
