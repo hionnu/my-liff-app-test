@@ -26,10 +26,10 @@ jobs:
           cat index.html
           echo "::endgroup::"
 
-      - name: "🔐 Check SECRET_KEY and SECRET_KEY2 existence and length" # ステップ名を元に戻す
+      - name: "🔐 Check SECRET_KEY and SECRET_KEY2 existence and length"
         env:
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
-          SECRET_KEY2: ${{ secrets.SECRET_KEY2 }}
+          SECRET_KEY2: ${{ secrets.SECRET_KEY2 }} # GitHub Secrets側のキー名と一致させてください
         run: |
           if [ -z "${SECRET_KEY}" ]; then
             echo "SECRET_KEY is empty or not set!"
@@ -41,8 +41,8 @@ jobs:
           fi
           echo "SECRET_KEY length: ${#SECRET_KEY}"
           echo "SECRET_KEY2 length: ${#SECRET_KEY2}"
-          echo "SECRET_KEY first 10 chars: ${SECRET_KEY:0:10}" # 最初の10文字に戻す
-          echo "SECRET_KEY2 first 10 chars: ${SECRET_KEY2:0:10}" # 最初の10文字に戻す
+          echo "SECRET_KEY first 10 chars: ${SECRET_KEY:0:10}"
+          echo "SECRET_KEY2 first 10 chars: ${SECRET_KEY2:0:10}"
 
       - name: "Inject secrets into HTML"
         env:
@@ -50,16 +50,15 @@ jobs:
           LIFF_ID: ${{ secrets.SECRET_KEY2 }}          # 変数名を明確化
         run: |
           # Cloud Function URL を置換
-          # sed の区切り文字として "_@_" を使用し、変数内の特殊文字（& \ と delimiter）をエスケープ
-          # sed の replacement string では、&, \, および区切り文字自体をエスケープする必要があります。
-          # 検索パターン内の {{ と }} をエスケープし、余分なスペースを削除しました。
-          ESCAPED_CLOUDFUNCTION_URL=$(echo "${CLOUDFUNCTION_URL}" | sed -e 's/&/\\&/g' -e 's/\\/\\\\/g' -e 's/_@_/\\_@_/g')
-          sed -i "s_@_\\{\\{SECRET_KEY\\}\\}@_${ESCAPED_CLOUDFUNCTION_URL}_@_g" index.html
+          # sed の区切り文字として '%' を使用
+          ESCAPED_CLOUDFUNCTION_URL=$(echo "${CLOUDFUNCTION_URL}" | sed -e 's/[\%&\]/\\&/g') # Escape %, &, \
+          # プレースホルダーを大文字に修正
+          sed -i "s%{{SECRET_KEY}}%${ESCAPED_CLOUDFUNCTION_URL}%g" index.html
 
           # LIFF ID を置換
-          # 検索パターン内の {{ と }} をエスケープし、余分なスペースを削除しました。
-          ESCAPED_LIFF_ID=$(echo "${LIFF_ID}" | sed -e 's/&/\\&/g' -e 's/\\/\\\\/g' -e 's/_@_/\\_@_/g')
-          sed -i "s_@_\\{\\{SECRET_KEY2\\}\\}@_${ESCAPED_LIFF_ID}_@_g" index.html
+          ESCAPED_LIFF_ID=$(echo "${LIFF_ID}" | sed -e 's/[\%&\]/\\&/g') # Escape %, &, \
+          # プレースホルダーを大文字に修正
+          sed -i "s%{{SECRET_KEY2}}%${ESCAPED_LIFF_ID}%g" index.html
 
       - name: "🔍 Debug: プレースホルダ確認（置換後）"
         run: |
