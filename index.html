@@ -8,20 +8,19 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* カスタムカラー設定 for Tailwind JIT */
-        /* 画像の明るい雰囲気とコーポレートカラーを基に再定義 */
         :root {
-            /* ベースカラー (明るいトーン) */
-            --color-primary-bg: #F8F9FA;    /* 非常に明るい背景色 (ほぼ白) */
-            --color-card-bg: #FFFFFF;      /* カードの背景色 (純白) */
-            --color-text-dark: #212529;    /* 主要なテキスト色 (濃いグレー) */
-            --color-text-muted: #6C757D;   /* 控えめなテキスト色 (中間グレー) */
-            --color-border-subtle: #DEE2E6; /* 微妙なボーダー色 */
+            /* ベースカラー (ネイビー基調 - ユーザー指定色) */
+            --color-primary-bg: #3072B5;    /* メイン背景色 (ユーザー指定の濃いネイビー) */
+            --color-card-bg: #FFFFFF;      /* カードの背景色 (白) */
+            --color-text-dark: #2C3E50;    /* 主要なテキスト色 (濃い青みがかったグレー) */
+            --color-text-muted: #7F8C8D;   /* 控えめなテキスト色 (ニュートラルなグレー) */
+            --color-border-subtle: #BDC3C7; /* 微妙なボーダー色 */
 
-            /* コーポレートカラー (明るく、活気のあるトーン) */
-            --color-corporate-green: #28A745; /* 強めの緑 */
-            --color-corporate-green-light: #E9F8EE; /* 非常に明るい緑 (背景用) */
-            --color-corporate-blue: #007BFF;  /* 強めの青 */
-            --color-corporate-blue-light: #E0EFFE; /* 非常に明るい青 (背景用) */
+            /* コーポレートカラー (緑とネイビー) */
+            --color-corporate-green: #27AE60; /* 鮮やかな緑 */
+            --color-corporate-green-light: #EBF9ED; /* 非常に明るい緑 (背景用) */
+            --color-corporate-navy: #004F9F; /* 強めのネイビー (アクセント、画像から抽出) */
+            --color-corporate-navy-light: #B7D9F0; /* 非常に明るいネイビー (新しい背景に合わせたライトトーン) */
 
             /* ボタンやアクセント用のシャドウ */
             --shadow-md-custom: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -36,14 +35,15 @@
         .bg-corporate-green { background-color: var(--color-corporate-green); }
         .bg-corporate-green-light { background-color: var(--color-corporate-green-light); }
         .text-corporate-green { color: var(--color-corporate-green); }
-        .bg-corporate-blue { background-color: var(--color-corporate-blue); }
-        .bg-corporate-blue-light { background-color: var(--color-corporate-blue-light); }
-        .text-corporate-blue { color: var(--color-corporate-blue); }
 
-        /* フォーカスリングの色をコーポレートブルーに */
-        .focus-ring-corporate-blue:focus { 
-            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.4); /* RGBA for transparency */
-            border-color: var(--color-corporate-blue); 
+        .bg-corporate-navy { background-color: var(--color-corporate-navy); }
+        .bg-corporate-navy-light { background-color: var(--color-corporate-navy-light); }
+        .text-corporate-navy { color: var(--color-corporate-navy); }
+
+        /* フォーカスリングの色をコーポレートネイビーに */
+        .focus-ring-corporate-navy:focus { 
+            box-shadow: 0 0 0 3px rgba(0, 79, 159, 0.4); /* RGBA for transparency using navy hex */
+            border-color: var(--color-corporate-navy); 
         }
 
         /* カスタムシャドウ */
@@ -62,7 +62,7 @@
         /* Placeholder text color */
         .placeholder-text-muted::placeholder {
             color: var(--color-text-muted);
-            opacity: 0.7; /* Optional: make it slightly lighter */
+            opacity: 0.7;
         }
     </style>
     <!-- LIFF SDK -->
@@ -83,16 +83,16 @@
                         <i class="bi bi-building text-corporate-green mr-2"></i> 会社名
                     </label>
                     <input type="text" id="companyName" required
-                           class="w-full p-3.5 rounded-lg bg-gray-50 border border-border-subtle text-text-dark placeholder-text-muted
-                                 focus:outline-none focus:ring-2 focus:ring-corporate-blue focus-ring-corporate-blue text-base">
+                           class="w-full p-3.5 rounded-lg bg-corporate-green-light border border-border-subtle text-text-dark placeholder-text-muted
+                                 focus:outline-none focus:ring-2 focus:ring-corporate-navy focus-ring-corporate-navy text-base">
                 </div>
                 <div class="form-group">
                     <label for="fullName" class="block text-text-dark text-sm font-semibold mb-2 required">
                         <i class="bi bi-person-badge text-corporate-green mr-2"></i> 氏名
                     </label>
                     <input type="text" id="fullName" required
-                           class="w-full p-3.5 rounded-lg bg-gray-50 border border-border-subtle text-text-dark placeholder-text-muted
-                                 focus:outline-none focus:ring-2 focus:ring-corporate-blue focus-ring-corporate-blue text-base">
+                           class="w-full p-3.5 rounded-lg bg-corporate-green-light border border-border-subtle text-text-dark placeholder-text-muted
+                                 focus:outline-none focus:ring-2 focus:ring-corporate-navy focus-ring-corporate-navy text-base">
                 </div>
             </div>
 
@@ -103,16 +103,16 @@
                         <i class="bi bi-envelope-fill text-corporate-green mr-2"></i> メールアドレス
                     </label>
                     <input type="email" id="email" required
-                           class="w-full p-3.5 rounded-lg bg-gray-50 border border-border-subtle text-text-dark placeholder-text-muted
-                                 focus:outline-none focus:ring-2 focus:ring-corporate-blue focus-ring-corporate-blue text-base">
+                           class="w-full p-3.5 rounded-lg bg-corporate-green-light border border-border-subtle text-text-dark placeholder-text-muted
+                                 focus:outline-none focus:ring-2 focus:ring-corporate-navy focus-ring-corporate-navy text-base">
                 </div>
                 <div class="form-group">
                     <label for="phoneNumber" class="block text-text-dark text-sm font-semibold mb-2 required">
                         <i class="bi bi-phone-fill text-corporate-green mr-2"></i> 電話番号
                     </label>
                     <input type="tel" id="phoneNumber" pattern="[0-9\-]+" title="半角数字とハイフンのみ" required
-                           class="w-full p-3.5 rounded-lg bg-gray-50 border border-border-subtle text-text-dark placeholder-text-muted
-                                 focus:outline-none focus:ring-2 focus:ring-corporate-blue focus-ring-corporate-blue text-base">
+                           class="w-full p-3.5 rounded-lg bg-corporate-green-light border border-border-subtle text-text-dark placeholder-text-muted
+                                 focus:outline-none focus:ring-2 focus:ring-corporate-navy focus-ring-corporate-navy text-base">
                 </div>
             </div>
 
@@ -122,8 +122,8 @@
                     <i class="bi bi-geo-alt-fill text-corporate-green mr-2"></i> 納品先
                 </label>
                 <input type="text" id="deliveryAddress" required
-                       class="w-full p-3.5 rounded-lg bg-gray-50 border border-border-subtle text-text-dark placeholder-text-muted
-                             focus:outline-none focus:ring-2 focus:ring-corporate-blue focus-ring-corporate-blue text-base"
+                       class="w-full p-3.5 rounded-lg bg-corporate-green-light border border-border-subtle text-text-dark placeholder-text-muted
+                             focus:outline-none focus:ring-2 focus:ring-corporate-navy focus-ring-corporate-navy text-base"
                        placeholder="例: 東京都渋谷区神南1-2-3 〇〇ビル">
             </div>
 
@@ -133,8 +133,8 @@
                     <i class="bi bi-card-text text-corporate-green mr-2"></i> 注文内容
                 </label>
                 <textarea id="orderContent" required rows="4"
-                          class="w-full p-3.5 rounded-lg bg-gray-50 border border-border-subtle text-text-dark resize-y placeholder-text-muted
-                                focus:outline-none focus:ring-2 focus:ring-corporate-blue focus-ring-corporate-blue text-base"
+                          class="w-full p-3.5 rounded-lg bg-corporate-green-light border border-border-subtle text-text-dark resize-y placeholder-text-muted
+                                focus:outline-none focus:ring-2 focus:ring-corporate-navy focus-ring-corporate-navy text-base"
                           placeholder="明細は改行して入力してください"></textarea>
             </div>
 
@@ -144,47 +144,49 @@
                     <i class="bi bi-journal-text text-corporate-green mr-2"></i> 特記事項 (任意)
                 </label>
                 <textarea id="notes" rows="2"
-                          class="w-full p-3.5 rounded-lg bg-gray-50 border border-border-subtle text-text-dark resize-y placeholder-text-muted
-                                focus:outline-none focus:ring-2 focus:ring-corporate-blue focus-ring-corporate-blue text-base"></textarea>
+                          class="w-full p-3.5 rounded-lg bg-corporate-green-light border border-border-subtle text-text-dark resize-y placeholder-text-muted
+                                focus:outline-none focus:ring-2 focus:ring-corporate-navy focus-ring-corporate-navy text-base"></textarea>
             </div>
 
             <!-- 日付・時間関連 -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="form-group">
                     <label for="deliveryDate" class="block text-text-dark text-sm font-semibold mb-2 required">
                         <i class="bi bi-calendar-check text-corporate-green mr-2"></i> 配送日
                     </label>
                     <input type="date" id="deliveryDate" required
-                           class="w-full p-3.5 rounded-lg bg-gray-50 border border-border-subtle text-text-dark
-                                 focus:outline-none focus:ring-2 focus:ring-corporate-blue focus-ring-corporate-blue text-base">
+                           class="w-full p-3.5 rounded-lg bg-corporate-green-light border border-border-subtle text-text-dark
+                                 focus:outline-none focus:ring-2 focus:ring-corporate-navy focus-ring-corporate-navy text-base">
                 </div>
                 <div class="form-group">
                     <label for="deliveryTime" class="block text-text-dark text-sm font-semibold mb-2 required">
                         <i class="bi bi-clock-fill text-corporate-green mr-2"></i> 希望納品時間
                     </label>
                     <input type="time" id="deliveryTime" required
-                           class="w-full p-3.5 rounded-lg bg-gray-50 border border-border-subtle text-text-dark
-                                 focus:outline-none focus:ring-2 focus:ring-corporate-blue focus-ring-corporate-blue text-base">
+                           class="w-full p-3.5 rounded-lg bg-corporate-green-light border border-border-subtle text-text-dark
+                                 focus:outline-none focus:ring-2 focus:ring-corporate-navy focus-ring-corporate-navy text-base">
                 </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="form-group">
                     <label for="scaffoldDate" class="block text-text-dark text-sm font-semibold mb-2">
                         <i class="bi bi-hammer text-corporate-green mr-2"></i> 足場組立日 (任意)
                     </label>
                     <input type="date" id="scaffoldDate"
-                           class="w-full p-3.5 rounded-lg bg-gray-50 border border-border-subtle text-text-dark
-                                 focus:outline-none focus:ring-2 focus:ring-corporate-blue focus-ring-corporate-blue text-base">
+                           class="w-full p-3.5 rounded-lg bg-corporate-green-light border border-border-subtle text-text-dark
+                                 focus:outline-none focus:ring-2 focus:ring-corporate-navy focus-ring-corporate-navy text-base">
                 </div>
-                <div class="form-group md:col-span-3">
+                <div class="form-group">
                     <label for="jotoDate" class="block text-text-dark text-sm font-semibold mb-2">
                         <i class="bi bi-house-door-fill text-corporate-green mr-2"></i> 上棟日 (任意)
                     </label>
                     <input type="date" id="jotoDate"
-                           class="w-full p-3.5 rounded-lg bg-gray-50 border border-border-subtle text-text-dark
-                                 focus:outline-none focus:ring-2 focus:ring-corporate-blue focus-ring-corporate-blue text-base">
+                           class="w-full p-3.5 rounded-lg bg-corporate-green-light border border-border-subtle text-text-dark
+                                 focus:outline-none focus:ring-2 focus:ring-corporate-navy focus-ring-corporate-navy text-base">
                 </div>
             </div>
             
-            <!-- New File Upload Section -->
+            <!-- File Upload Section -->
             <div class="form-group bg-corporate-green-light p-6 rounded-xl shadow-md-custom border border-corporate-green">
                 <label class="block text-text-dark text-lg font-semibold mb-3">
                     <i class="bi bi-paperclip text-corporate-green mr-2"></i> 添付ファイル (任意, 最大3つまで)
@@ -192,7 +194,7 @@
                 <input type="file" id="fileInput" accept="image/*, .pdf" multiple
                        class="w-full text-text-dark text-sm file:mr-4 file:py-2 file:px-4
                               file:rounded-full file:border-0 file:text-sm file:font-semibold
-                              file:bg-corporate-blue file:text-white hover:file:bg-blue-700 cursor-pointer">
+                              file:bg-corporate-navy file:text-white hover:file:bg-[#003B7F] cursor-pointer">
                 <div id="fileList" class="mt-4 space-y-2 text-text-muted text-sm">
                     <!-- 選択されたファイルが表示される -->
                 </div>
@@ -234,8 +236,7 @@
         let currentUserId = '未取得'; 
         let currentUserName = '未取得';
         let currentChatRoomId = '未取得'; 
-        let accessNotified = false; 
-        const uploadedFiles = []; // ファイルデータをBase64で保持する配列
+        const uploadedFiles = [];
 
         // --- ファイルアップロード関連のJSロジック ---
         fileInput.addEventListener('change', (event) => {
@@ -253,7 +254,7 @@
                     if (file.size > 10 * 1024 * 1024) {
                         statusMessage.innerText = `ファイル「${file.name}」は10MBを超えています。`;
                         statusMessage.classList.add('error', 'text-red-500');
-                        continue; // 次のファイルへ
+                        continue;
                     }
 
                     const reader = new FileReader();
@@ -261,10 +262,10 @@
                         uploadedFiles.push({
                             name: file.name,
                             type: file.type,
-                            data: e.target.result // Base64データ
+                            data: e.target.result
                         });
                         renderFileList();
-                        statusMessage.innerText = ''; // エラーメッセージをクリア
+                        statusMessage.innerText = '';
                         statusMessage.classList.remove('error', 'text-red-500');
                     };
                     reader.onerror = (e) => {
@@ -272,10 +273,10 @@
                         statusMessage.classList.add('error', 'text-red-500');
                         console.error('FileReader error:', e);
                     };
-                    reader.readAsDataURL(file); // ファイルをBase64に変換
+                    reader.readAsDataURL(file);
                 }
             }
-            fileInput.value = ''; // ファイル選択をリセット
+            fileInput.value = '';
         });
 
         // ファイルリストの表示を更新
@@ -283,10 +284,10 @@
             fileListDiv.innerHTML = '';
             uploadedFiles.forEach((file, index) => {
                 const fileItem = document.createElement('div');
-                fileItem.classList.add('flex', 'items-center', 'justify-between', 'bg-corporate-blue-light', 'p-2', 'rounded-lg', 'shadow-sm');
+                fileItem.classList.add('flex', 'items-center', 'justify-between', 'bg-corporate-green-light', 'p-2', 'rounded-lg', 'shadow-sm');
                 fileItem.innerHTML = `
                     <span class="text-text-dark text-sm font-medium flex items-center">
-                        <i class="bi bi-file-earmark-fill text-corporate-blue mr-2"></i>
+                        <i class="bi bi-file-earmark-fill text-corporate-navy mr-2"></i>
                         ${file.name} (${(file.data.length / 1024 / 1024).toFixed(2)} MB)
                     </span>
                     <button type="button" data-index="${index}"
@@ -296,7 +297,7 @@
                     </button>
                 `;
                 fileItem.querySelector('button').addEventListener('click', (e) => {
-                    const idxToRemove = parseInt(e.currentTarget.dataset.index); // currentTargetを使用
+                    const idxToRemove = parseInt(e.currentTarget.dataset.index);
                     uploadedFiles.splice(idxToRemove, 1);
                     renderFileList();
                     statusMessage.innerText = 'ファイルが削除されました。';
@@ -339,7 +340,6 @@
             }
         }
 
-
         // LIFF初期化処理
         if (typeof liff === 'undefined') {
             console.error("エラー: LIFF SDKが読み込まれていません。スクリプトタグを確認してください。");
@@ -373,22 +373,7 @@
                         console.warn('LIFF context is null.');
                     }
 
-                    // ★LIFFにログインし、ユーザーIDが取得できたらアクセス通知を送信★
-                    if (!accessNotified && currentUserId !== '未取得') {
-                        try {
-                            const result = await sendToCloudFunction('notify_access', { userId: currentUserId });
-                            if (result.success) {
-                                console.log('Access notification sent successfully.');
-                                accessNotified = true; 
-                            } else {
-                                console.error('Failed to send access notification:', result.message);
-                            }
-                        } catch (notifyError) {
-                            console.error('Error sending access notification:', notifyError);
-                        }
-                    }
-
-                    // ★ユーザーIDが取得できたら、スプレッドシートから既存のプロフィールを読み込み自動入力★
+                    // ユーザーIDが取得できたら、スプレッドシートから既存のプロフィールを読み込み自動入力
                     if (currentUserId !== '未取得') {
                         try {
                             const result = await sendToCloudFunction('get_user_profile', { userId: currentUserId });
@@ -397,13 +382,12 @@
                                 document.getElementById('fullName').value = result.data.fullName || '';
                                 document.getElementById('email').value = result.data.email || '';
                                 document.getElementById('phoneNumber').value = result.data.phoneNumber || '';
-                                // 新しい項目を自動入力に追加
                                 document.getElementById('deliveryAddress').value = result.data.deliveryAddress || '';
                                 document.getElementById('deliveryTime').value = result.data.deliveryTime || '';
 
                                 statusMessage.innerText = '前回の情報が自動入力されました。';
                                 statusMessage.classList.remove('text-red-500');
-                                statusMessage.classList.add('text-text-muted'); // 控えめな色
+                                statusMessage.classList.add('text-text-muted');
                             } else if (result.success && !result.data) {
                                 statusMessage.innerText = '初回利用、または既存の情報が見つかりませんでした。';
                                 statusMessage.classList.remove('text-red-500');
@@ -427,18 +411,18 @@
             })
             .catch((err) => {
                 console.error("LIFF初期化に失敗しました: ", err);
-                userIdDisplay.innerText = '初期化エラー';
-                userNameDisplay.innerText = '初期化エラー';
+                userIdDisplay.innerText = 'エラー: SDK読み込み失敗';
+                userNameDisplay.innerText = 'エラー: SDK読み込み失敗';
             });
         }
 
         // 注文送信ボタンの処理
         document.getElementById('orderForm').addEventListener('submit', async (e) => {
-            e.preventDefault(); // デフォルトのフォーム送信を防止
+            e.preventDefault();
 
             statusMessage.innerText = '';
-            statusMessage.classList.remove('error', 'text-red-500', 'text-corporate-green', 'text-corporate-blue'); 
-            statusMessage.classList.add('text-text-dark'); /* デフォルト色に戻す */
+            statusMessage.classList.remove('error', 'text-red-500', 'text-corporate-green', 'text-corporate-navy'); 
+            statusMessage.classList.add('text-text-dark');
 
             if (!liff.isLoggedIn()) {
                 statusMessage.innerText = 'LIFFにログインしていません。ログイン後に再度お試しください。';
@@ -458,11 +442,11 @@
                 fullName: document.getElementById('fullName').value,
                 email: document.getElementById('email').value,
                 phoneNumber: document.getElementById('phoneNumber').value,
-                deliveryAddress: document.getElementById('deliveryAddress').value, // 新しい項目
+                deliveryAddress: document.getElementById('deliveryAddress').value,
                 orderContent: document.getElementById('orderContent').value,
                 notes: document.getElementById('notes').value,
                 deliveryDate: document.getElementById('deliveryDate').value,
-                deliveryTime: document.getElementById('deliveryTime').value, // 新しい項目
+                deliveryTime: document.getElementById('deliveryTime').value,
                 scaffoldDate: document.getElementById('scaffoldDate').value,
                 jotoDate: document.getElementById('jotoDate').value
             };
@@ -473,10 +457,10 @@
                 fullName: '氏名',
                 email: 'メールアドレス',
                 phoneNumber: '電話番号',
-                deliveryAddress: '納品先', // 新しい項目
+                deliveryAddress: '納品先',
                 orderContent: '注文内容',
                 deliveryDate: '配送日',
-                deliveryTime: '希望納品時間', // 新しい項目
+                deliveryTime: '希望納品時間',
             };
 
             for (const key in requiredFields) {
