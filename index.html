@@ -306,8 +306,8 @@
         const userIdDisplay = document.getElementById('userIdDisplay');
         const userNameDisplay = document.getElementById('userNameDisplay');
         const statusMessage = document.getElementById('statusMessage');
-        const pastOrdersStatus = document.getElementById('pastOrdersStatus'); // New
-        const pastOrdersList = document.getElementById('pastOrdersList');     // New
+        const pastOrdersStatus = document.getElementById('pastOrdersStatus');
+        const pastOrdersList = document.getElementById('pastOrdersList');
         const versionInfoElement = document.getElementById('versionInfo'); 
         const submitOrderButton = document.getElementById('submitOrder');
         const fileInput = document.getElementById('fileInput');
@@ -476,6 +476,25 @@
                 const orderCard = document.createElement('div');
                 orderCard.classList.add('bg-corporate-green-light', 'p-4', 'rounded-lg', 'shadow-sm', 'border', 'border-corporate-green');
                 
+                // Construct delivery and joto/scaffold info line
+                let dateInfo = '';
+                if (order.deliveryDate) {
+                    dateInfo += `<span class="font-semibold">配送日:</span> ${order.deliveryDate}`;
+                }
+                if (order.deliveryTime) {
+                    dateInfo += ` （${order.deliveryTime}）`;
+                }
+                if (order.scaffoldDate && order.scaffoldDate !== 'なし') {
+                    dateInfo += ` <span class="font-semibold">足場組立日:</span> ${order.scaffoldDate}`;
+                }
+                if (order.jotoDate && order.jotoDate !== 'なし') {
+                    dateInfo += ` <span class="font-semibold">上棟日:</span> ${order.jotoDate}`;
+                }
+                if (dateInfo === '') {
+                    dateInfo = '<span class="font-semibold">日付情報:</span> なし';
+                }
+
+
                 orderCard.innerHTML = `
                     <div class="flex justify-between items-start mb-2">
                         <h3 class="text-lg font-semibold text-text-dark break-words w-4/5">${order.companyName || '会社名不明'} - ${order.fullName || '氏名不明'}</h3>
@@ -484,13 +503,14 @@
                             <i class="bi bi-copy mr-1"></i>コピー
                         </button>
                     </div>
-                    <p class="text-text-muted text-sm mb-1"><span class="font-semibold">発注番号:</span> ${order.orderTimestamp || '不明'}</p>
-                    <p class="text-text-muted text-sm mb-1"><span class="font-semibold">入力日時:</span> ${order.inputDateTimeJST || '不明'}</p>
                     <p class="text-text-dark text-base mb-1"><span class="font-semibold">納品先:</span> ${order.deliveryAddress || 'なし'}</p>
-                    <p class="text-text-dark text-base mb-1"><span class="font-semibold">注文内容:</span> <span class="whitespace-pre-wrap">${order.orderContent || 'なし'}</span></p>
-                    <p class="text-text-muted text-sm mb-1"><span class="font-semibold">配送日:</span> ${order.deliveryDate || 'なし'}</p>
-                    <p class="text-text-muted text-sm mb-1"><span class="font-semibold">希望納品時間:</span> ${order.deliveryTime || 'なし'}</p>
+                    <p class="text-text-muted text-sm mb-1">
+                        <span class="font-semibold">発注番号:</span> ${order.orderTimestamp || '不明'} 
+                        <span class="ml-4 font-semibold">入力日時:</span> ${order.inputDateTimeJST || '不明'}
+                    </p>
                     <p class="text-text-muted text-sm mb-1"><span class="font-semibold">特記事項:</span> ${order.notes || 'なし'}</p>
+                    <p class="text-text-muted text-sm mb-1">${dateInfo}</p>
+                    <p class="text-text-dark text-base mb-1"><span class="font-semibold">注文内容:</span> <span class="whitespace-pre-wrap">${order.orderContent || 'なし'}</span></p>
                     ${order.file1URL ? `<p class="text-text-muted text-sm mb-1"><span class="font-semibold">添付ファイル1:</span> <a href="${order.file1URL}" target="_blank" class="text-corporate-navy hover:underline break-all">開く</a></p>` : ''}
                     ${order.file2URL ? `<p class="text-text-muted text-sm mb-1"><span class="font-semibold">添付ファイル2:</span> <a href="${order.file2URL}" target="_blank" class="text-corporate-navy hover:underline break-all">開く</a></p>` : ''}
                     ${order.file3URL ? `<p class="text-text-muted text-sm mb-1"><span class="font-semibold">添付ファイル3:</span> <a href="${order.file3URL}" target="_blank" class="text-corporate-navy hover:underline break-all">開く</a></p>` : ''}
@@ -576,8 +596,7 @@
                                 document.getElementById('fullName').value = result.data.fullName || '';
                                 document.getElementById('email').value = result.data.email || '';
                                 document.getElementById('phoneNumber').value = result.data.phoneNumber || '';
-                                document.getElementById('deliveryAddress').value = result.data.deliveryAddress || '';
-                                document.getElementById('deliveryTime').value = result.data.deliveryTime || '';
+                                // deliveryAddressとdeliveryTimeは自動入力しないため、ここには含めない
 
                                 statusMessage.innerText = '前回の情報が自動入力されました。';
                                 statusMessage.classList.remove('text-red-500');
