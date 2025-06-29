@@ -6,7 +6,7 @@ on:
       - main
 
 permissions:
-  contents: read      # リポジトリの読み取り
+  contents: read      # リポジトリの読み取
   pages: write        # GitHub Pages への書き込み
   id-token: write     # OIDC トークン取得
 
