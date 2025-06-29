@@ -20,6 +20,12 @@ jobs:
       - name: "Checkout repository"
         uses: actions/checkout@v3
 
+      - name: "Normalize line endings for index.html" # 新しいステップ: 改行コードをLFに統一
+        run: |
+          # CRLFをLFに変換 (Windowsで編集した場合などに備える)
+          sed -i 's/\r$//' index.html
+          echo "Normalized line endings for index.html"
+
       - name: "🔍 Debug: プレースホルダ確認（置換前）"
         run: |
           echo "::group::index.html (before)"
@@ -29,7 +35,7 @@ jobs:
       - name: "🔐 Check SECRET_KEY and SECRET_KEY2 existence and length"
         env:
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
-          SECRET_KEY2: ${{ secrets.SECRET_KEY2 }} # GitHub Secrets側のキー名と一致させてください
+          SECRET_KEY2: ${{ secrets.SECRET_KEY2 }}
         run: |
           if [ -z "${SECRET_KEY}" ]; then
             echo "SECRET_KEY is empty or not set!"
@@ -49,16 +55,22 @@ jobs:
           CLOUDFUNCTION_URL: ${{ secrets.SECRET_KEY }} # 変数名を明確化
           LIFF_ID: ${{ secrets.SECRET_KEY2 }}          # 変数名を明確化
         run: |
+          # sedの検索パターンをより厳密にマッチさせるために、空白文字なども含めてエスケープ
+          # 注意: sedコマンドは行ごとに処理されるため、複数行にわたる置換はできません。
+          # 今回は同一行に存在するため問題ありません。
+
           # Cloud Function URL を置換
           # sed の区切り文字として '%' を使用
           ESCAPED_CLOUDFUNCTION_URL=$(echo "${CLOUDFUNCTION_URL}" | sed -e 's/[\%&\]/\\&/g') # Escape %, &, \
-          # プレースホルダーを大文字に修正
-          sed -i "s%{{SECRET_KEY}}%${ESCAPED_CLOUDFUNCTION_URL}%g" index.html
+          # 'const cloudFunctionUrl = ' と '; の間の文字列を置換
+          sed -i "s%const cloudFunctionUrl = '{{SECRET_KEY}}';%const cloudFunctionUrl = '${ESCAPED_CLOUDFUNCTION_URL}';%g" index.html
 
           # LIFF ID を置換
           ESCAPED_LIFF_ID=$(echo "${LIFF_ID}" | sed -e 's/[\%&\]/\\&/g') # Escape %, &, \
-          # プレースホルダーを大文字に修正
-          sed -i "s%{{SECRET_KEY2}}%${ESCAPED_LIFF_ID}%g" index.html
+          # 'const liffId = ' と '; の間の文字列を置換
+          # スクリーンショットのliffIdが小文字なので、その可能性も考慮しつつ、元のindex.htmlに合わせて大文字で統一
+          sed -i "s%const liffId = '{{SECRET_KEY2}}';%const liffId = '${ESCAPED_LIFF_ID}';%g" index.html
+
 
       - name: "🔍 Debug: プレースホルダ確認（置換後）"
         run: |
