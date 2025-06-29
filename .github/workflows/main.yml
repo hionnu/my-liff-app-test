@@ -52,12 +52,14 @@ jobs:
           # Cloud Function URL を置換
           # sed の区切り文字として "_@_" を使用し、変数内の特殊文字（& \ と delimiter）をエスケープ
           # sed の replacement string では、&, \, および区切り文字自体をエスケープする必要があります。
+          # 検索パターン内の {{ と }} をエスケープしました。
           ESCAPED_CLOUDFUNCTION_URL=$(echo "${CLOUDFUNCTION_URL}" | sed -e 's/&/\\&/g' -e 's/\\/\\\\/g' -e 's/_@_/\\_@_/g')
-          sed -i "s_@_{{SECRET_KEY}}_@_${ESCAPED_CLOUDFUNCTION_URL}_@_g" index.html
+          sed -i "s_@_\\{\\{SECRET_KEY\\}\\} _@_${ESCAPED_CLOUDFUNCTION_URL}_@_g" index.html
 
           # LIFF ID を置換
+          # 検索パターン内の {{ と }} をエスケープしました。
           ESCAPED_LIFF_ID=$(echo "${LIFF_ID}" | sed -e 's/&/\\&/g' -e 's/\\/\\\\/g' -e 's/_@_/\\_@_/g')
-          sed -i "s_@_{{SECRET_KEY2}}_@_${ESCAPED_LIFF_ID}_@_g" index.html
+          sed -i "s_@_\\{\\{SECRET_KEY2\\}\\} _@_${ESCAPED_LIFF_ID}_@_g" index.html
 
       - name: "🔍 Debug: プレースホルダ確認（置換後）"
         run: |
