@@ -300,8 +300,8 @@
     </div>
 
     <script>
-        const cloudFunctionUrl = 'https://handle-liff-order-request-261123846998.asia-northeast1.run.app';
-        const liffId = '2007576580-4q0azmME';
+        const cloudFunctionUrl = '{{SECRET_KEY}}';
+        const liffId = '{{SECRET_KEY2}}';
 
         const userIdDisplay = document.getElementById('userIdDisplay');
         const userNameDisplay = document.getElementById('userNameDisplay');
@@ -484,13 +484,14 @@
                 if (order.deliveryTime) {
                     dateInfo += ` （${order.deliveryTime}）`;
                 }
-                if (order.scaffoldDate && order.scaffoldDate !== 'なし') {
+                if (order.scaffoldDate && order.scaffoldDate !== 'なし' && order.scaffoldDate !== '') { // 空文字列も考慮
                     dateInfo += ` <span class="font-semibold">足場組立日:</span> ${order.scaffoldDate}`;
                 }
-                if (order.jotoDate && order.jotoDate !== 'なし') {
+                if (order.jotoDate && order.jotoDate !== 'なし' && order.jotoDate !== '') { // 空文字列も考慮
                     dateInfo += ` <span class="font-semibold">上棟日:</span> ${order.jotoDate}`;
                 }
-                if (dateInfo === '') {
+                // 日付情報が全て空の場合のみ「なし」を表示
+                if (dateInfo.trim() === '') {
                     dateInfo = '<span class="font-semibold">日付情報:</span> なし';
                 }
 
@@ -504,13 +505,14 @@
                         </button>
                     </div>
                     <p class="text-text-dark text-base mb-1"><span class="font-semibold">納品先:</span> ${order.deliveryAddress || 'なし'}</p>
-                    <p class="text-text-muted text-sm mb-1">
+                    <p class="text-text-muted text-sm mb-1 flex flex-wrap gap-x-4">
                         <span class="font-semibold">発注番号:</span> ${order.orderTimestamp || '不明'} 
-                        <span class="ml-4 font-semibold">入力日時:</span> ${order.inputDateTimeJST || '不明'}
+                        <span class="font-semibold">入力日時:</span> ${order.inputDateTimeJST || '不明'}
                     </p>
                     <p class="text-text-muted text-sm mb-1"><span class="font-semibold">特記事項:</span> ${order.notes || 'なし'}</p>
                     <p class="text-text-muted text-sm mb-1">${dateInfo}</p>
-                    <p class="text-text-dark text-base mb-1"><span class="font-semibold">注文内容:</span> <span class="whitespace-pre-wrap">${order.orderContent || 'なし'}</span></p>
+                    <p class="text-text-dark text-base mb-1"><span class="font-semibold">注文内容:</span></p>
+                    <p class="text-text-dark text-base mb-1 whitespace-pre-wrap">${order.orderContent || 'なし'}</p>
                     ${order.file1URL ? `<p class="text-text-muted text-sm mb-1"><span class="font-semibold">添付ファイル1:</span> <a href="${order.file1URL}" target="_blank" class="text-corporate-navy hover:underline break-all">開く</a></p>` : ''}
                     ${order.file2URL ? `<p class="text-text-muted text-sm mb-1"><span class="font-semibold">添付ファイル2:</span> <a href="${order.file2URL}" target="_blank" class="text-corporate-navy hover:underline break-all">開く</a></p>` : ''}
                     ${order.file3URL ? `<p class="text-text-muted text-sm mb-1"><span class="font-semibold">添付ファイル3:</span> <a href="${order.file3URL}" target="_blank" class="text-corporate-navy hover:underline break-all">開く</a></p>` : ''}
