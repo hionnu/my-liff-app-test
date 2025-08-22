@@ -1,0 +1,15 @@
+{
+  "name": "shift-scheduler",
+  "version": "1.0.0",
+  "description": "A shift scheduling application for a nursing home.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "lowdb": "^1.0.0"
+  },
+  "author": "Jules",
+  "license": "ISC"
+}
