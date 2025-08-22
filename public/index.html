@@ -7,8 +7,36 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>シフト希望提出</h1>
-    <!-- Content will be added later -->
+    <h1>シフトボード</h1>
+
+    <section>
+        <h2>シフト希望提出</h2>
+        <div id="request-calendar">
+            <!-- Request calendar will be here -->
+            <p>（ここはステップ6で実装します）</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>募集中のヘルプシフト</h2>
+        <div id="open-shifts-list">
+            <!-- Open shifts will be populated by JS -->
+        </div>
+    </section>
+
+    <!-- The Modal -->
+    <div id="request-modal" class="modal">
+      <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h3 id="modal-date"></h3>
+        <p>希望のシフトを選択してください。</p>
+        <form id="request-form">
+            <!-- Radio buttons will be populated by JS -->
+            <button type="submit">希望を提出</button>
+        </form>
+      </div>
+    </div>
+
     <script src="app.js"></script>
 </body>
 </html>

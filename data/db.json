@@ -1,6 +1,39 @@
 {
-  "users": [],
-  "shift_types": [],
+  "users": [
+    {
+      "id": 1,
+      "name": "田中 恵子",
+      "role": "staff",
+      "skills": [1, 3]
+    },
+    {
+      "id": 2,
+      "name": "佐藤 太郎",
+      "role": "staff",
+      "skills": [2]
+    }
+  ],
+  "qualifications": [
+    { "id": 1, "name": "正看護師" },
+    { "id": 2, "name": "介護福祉士" },
+    { "id": 3, "name": "普通救命講習" }
+  ],
+  "shift_types": [
+    {
+      "id": 1,
+      "name": "日勤",
+      "required_qualifications": []
+    },
+    {
+      "id": 2,
+      "name": "夜勤",
+      "required_qualifications": [
+        { "qualificationId": 1, "count": 1 }
+      ]
+    }
+  ],
   "shift_requests": [],
-  "schedules": []
+  "schedules": [],
+  "open_shifts": [],
+  "open_shift_applications": []
 }
